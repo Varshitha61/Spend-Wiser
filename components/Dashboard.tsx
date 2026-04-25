@@ -3,7 +3,7 @@ import { Transaction, Wallet, Budget } from '../types';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell
 } from 'recharts';
-import { TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, Search, FileText, IndianRupee, Zap, Plus } from 'lucide-react';
+import { TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, Search, FileText, IndianRupee, Zap, Plus, Download } from 'lucide-react';
 import LiquidGauge from './LiquidGauge';
 
 interface DashboardProps {
@@ -52,6 +52,25 @@ const Dashboard: React.FC<DashboardProps> = ({ transactions, wallets, budgets, o
     return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(amount);
   };
 
+  const exportToCSV = () => {
+    const headers = ['Date', 'Description', 'Category', 'Type', 'Amount (INR)'];
+    const rows = filteredTransactions.map(t => [
+      new Date(t.date).toLocaleDateString('en-IN'),
+      t.description,
+      t.category,
+      t.type,
+      t.amount.toString(),
+    ]);
+    const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `spendwiser-ledger-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="space-y-12 animate-reveal">
 
@@ -70,8 +89,8 @@ const Dashboard: React.FC<DashboardProps> = ({ transactions, wallets, budgets, o
       </div>
 
       {/* Stats Cards - Futuristic Vaults */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div className="glass-panel p-8 rounded-[2.5rem] relative overflow-hidden group glass-card-hover animate-reveal" style={{ animationDelay: '100ms' }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
+        <div className="glass-panel p-6 md:p-8 rounded-3xl md:rounded-[2.5rem] relative overflow-hidden group glass-card-hover animate-reveal" style={{ animationDelay: '100ms' }}>
           <div className="absolute right-[-20px] top-[-20px] p-4 opacity-5 group-hover:opacity-10 transition-all duration-700 group-hover:scale-125 text-white">
             <IndianRupee size={160} />
           </div>
@@ -84,7 +103,7 @@ const Dashboard: React.FC<DashboardProps> = ({ transactions, wallets, budgets, o
           </div>
         </div>
 
-        <div className="glass-panel p-8 rounded-[2.5rem] relative overflow-hidden group glass-card-hover animate-reveal" style={{ animationDelay: '200ms' }}>
+        <div className="glass-panel p-6 md:p-8 rounded-3xl md:rounded-[2.5rem] relative overflow-hidden group glass-card-hover animate-reveal" style={{ animationDelay: '200ms' }}>
           <div className="flex justify-between items-start relative z-10">
             <div>
               <p className="text-slate-500 text-[10px] font-black mb-2 uppercase tracking-[0.3em]">Total Inflow</p>
@@ -99,7 +118,7 @@ const Dashboard: React.FC<DashboardProps> = ({ transactions, wallets, budgets, o
           </div>
         </div>
 
-        <div className="glass-panel p-8 rounded-[2.5rem] relative overflow-hidden group glass-card-hover animate-reveal" style={{ animationDelay: '300ms' }}>
+        <div className="glass-panel p-6 md:p-8 rounded-3xl md:rounded-[2.5rem] relative overflow-hidden group glass-card-hover animate-reveal sm:col-span-2 lg:col-span-1" style={{ animationDelay: '300ms' }}>
           <div className="flex justify-between items-start relative z-10">
             <div>
               <p className="text-slate-500 text-[10px] font-black mb-2 uppercase tracking-[0.3em]">Total Outflow</p>
@@ -116,8 +135,8 @@ const Dashboard: React.FC<DashboardProps> = ({ transactions, wallets, budgets, o
       </div>
 
       {/* Budget Pulse Section - Floating Lab */}
-      <section className="glass-panel p-10 rounded-[3rem] relative overflow-hidden animate-reveal" style={{ animationDelay: '400ms' }}>
-        <div className="flex items-center justify-between mb-10 relative z-10">
+      <section className="glass-panel p-6 md:p-10 rounded-3xl md:rounded-[3rem] relative overflow-hidden animate-reveal" style={{ animationDelay: '400ms' }}>
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 md:mb-10 relative z-10 gap-4">
           <div className="flex items-center gap-4">
             <div className="bg-indigo-500/20 p-3 rounded-2xl border border-indigo-500/30 shadow-[0_0_20px_rgba(99,102,241,0.2)]">
               <Zap size={22} className="text-indigo-400 animate-pulse" />
@@ -133,7 +152,7 @@ const Dashboard: React.FC<DashboardProps> = ({ transactions, wallets, budgets, o
           </div>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-10 relative z-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-10 relative z-10">
           {budgets.map((budget, idx) => {
             const percent = (budget.spent / budget.limit) * 100;
             return (
@@ -161,10 +180,10 @@ const Dashboard: React.FC<DashboardProps> = ({ transactions, wallets, budgets, o
         <div className="absolute -left-20 -top-20 w-96 h-96 bg-purple-600/5 rounded-full blur-[120px] pointer-events-none" />
       </section>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 animate-reveal" style={{ animationDelay: '1000ms' }}>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-10 animate-reveal" style={{ animationDelay: '1000ms' }}>
         {/* Charts Area */}
-        <div className="lg:col-span-2 glass-panel p-10 rounded-[3rem] shadow-2xl border border-white/5 group relative overflow-hidden">
-          <div className="flex items-center justify-between mb-10">
+        <div className="lg:col-span-2 glass-panel p-6 md:p-10 rounded-3xl md:rounded-[3rem] shadow-2xl border border-white/5 group relative overflow-hidden">
+          <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 md:mb-10 gap-4">
             <h4 className="text-xl font-black text-white tracking-tighter uppercase">Spending Landscape</h4>
             <div className="h-1 w-20 bg-indigo-600/30 rounded-full overflow-hidden">
               <div className="h-full bg-indigo-500 w-[60%] animate-pulse"></div>
@@ -197,8 +216,8 @@ const Dashboard: React.FC<DashboardProps> = ({ transactions, wallets, budgets, o
         </div>
 
         {/* Mini Transaction List */}
-        <div className="lg:col-span-1 glass-panel p-10 rounded-[3rem] shadow-2xl border border-white/5 flex flex-col h-[520px] group transition-all duration-500 hover:border-white/10">
-          <div className="flex items-center justify-between mb-8">
+        <div className="lg:col-span-1 glass-panel p-6 md:p-10 rounded-3xl md:rounded-[3rem] shadow-2xl border border-white/5 flex flex-col h-[400px] md:h-[520px] group transition-all duration-500 hover:border-white/10">
+          <div className="flex items-center justify-between mb-6 md:mb-8">
             <h4 className="text-xl font-black text-white uppercase tracking-tighter">Live Feed</h4>
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
           </div>
@@ -227,8 +246,8 @@ const Dashboard: React.FC<DashboardProps> = ({ transactions, wallets, budgets, o
               </div>
             ))}
           </div>
-          <button className="mt-6 w-full py-4 bg-white/5 hover:bg-white/10 rounded-2xl text-[9px] font-black uppercase tracking-[0.3em] text-slate-400 transition-all border border-white/5 hover:border-white/10">
-            Export Ledger
+          <button onClick={exportToCSV} className="mt-6 w-full py-4 bg-white/5 hover:bg-white/10 rounded-2xl text-[9px] font-black uppercase tracking-[0.3em] text-slate-400 transition-all border border-white/5 hover:border-white/10 flex items-center justify-center gap-2">
+            <Download size={12} /> Export Ledger
           </button>
         </div>
       </div>

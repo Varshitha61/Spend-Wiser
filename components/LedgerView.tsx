@@ -1,16 +1,36 @@
 import React from 'react';
 import { Transaction } from '../types';
-import { Search, ChevronRight, TrendingUp, TrendingDown, Clock, Filter, ListFilter, Zap } from 'lucide-react';
+import { Search, ChevronRight, TrendingUp, TrendingDown, Clock, ListFilter, Zap, Trash2, Download } from 'lucide-react';
 
 interface LedgerViewProps {
     transactions: Transaction[];
     searchQuery: string;
     onSearch: (query: string) => void;
+    onDelete?: (id: string) => void;
 }
 
-const LedgerView: React.FC<LedgerViewProps> = ({ transactions, searchQuery, onSearch }) => {
+const LedgerView: React.FC<LedgerViewProps> = ({ transactions, searchQuery, onSearch, onDelete }) => {
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(amount);
+    };
+
+    const exportToCSV = () => {
+        const headers = ['Date', 'Description', 'Category', 'Type', 'Amount (INR)'];
+        const rows = filteredTransactions.map(t => [
+            new Date(t.date).toLocaleDateString('en-IN'),
+            t.description,
+            t.category,
+            t.type,
+            t.amount.toString(),
+        ]);
+        const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `spendwiser-ledger-${new Date().toISOString().slice(0, 10)}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
     };
 
     const filteredTransactions = transactions
@@ -47,6 +67,18 @@ const LedgerView: React.FC<LedgerViewProps> = ({ transactions, searchQuery, onSe
                             <ListFilter size={18} />
                             <span className="text-[10px] font-black uppercase tracking-widest hidden md:inline">Sort Protocol</span>
                         </button>
+                        <button onClick={exportToCSV} className="px-6 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 rounded-2xl transition-all border border-emerald-500/20 flex items-center gap-2">
+                            <Download size={16} />
+                            <span className="text-[10px] font-black uppercase tracking-widest hidden md:inline">Export CSV</span>
+                        </button>
+                        <a
+                            href="/api/transactions/download"
+                            download
+                            className="px-6 py-5 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 rounded-2xl transition-all border border-indigo-500/20 flex items-center gap-2"
+                        >
+                            <Download size={16} />
+                            <span className="text-[10px] font-black uppercase tracking-widest hidden md:inline">Download Excel</span>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -92,11 +124,22 @@ const LedgerView: React.FC<LedgerViewProps> = ({ transactions, searchQuery, onSe
                                     </div>
                                 </div>
 
-                                <div className="text-right">
-                                    <p className={`text-2xl font-black tracking-tighter transition-all group-hover:scale-110 ${tx.type === 'income' ? 'text-emerald-400' : 'text-white'}`}>
-                                        {tx.type === 'income' ? '+' : '-'}{formatCurrency(tx.amount)}
-                                    </p>
-                                    <p className="text-[8px] font-black text-slate-600 uppercase tracking-widest mt-1 opacity-0 group-hover:opacity-100 transition-opacity">Execution Success</p>
+                                <div className="text-right flex items-center gap-4">
+                                    <div>
+                                        <p className={`text-2xl font-black tracking-tighter transition-all group-hover:scale-110 ${tx.type === 'income' ? 'text-emerald-400' : 'text-white'}`}>
+                                            {tx.type === 'income' ? '+' : '-'}{formatCurrency(tx.amount)}
+                                        </p>
+                                        <p className="text-[8px] font-black text-slate-600 uppercase tracking-widest mt-1 opacity-0 group-hover:opacity-100 transition-opacity">Execution Success</p>
+                                    </div>
+                                    {onDelete && (
+                                        <button
+                                            onClick={() => onDelete(tx.id)}
+                                            className="opacity-0 group-hover:opacity-100 p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500/20 transition-all"
+                                            title="Delete transaction"
+                                        >
+                                            <Trash2 size={14} />
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         ))

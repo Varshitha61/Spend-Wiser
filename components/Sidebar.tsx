@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, Wallet, CreditCard, Sparkles, Menu, X, Zap, Cpu, ShieldCheck } from 'lucide-react';
+import { LayoutDashboard, Wallet, CreditCard, Sparkles, Lightbulb, Menu, X, Zap, Cpu, ShieldCheck, TrendingUp, User, Settings as SettingsIcon } from 'lucide-react';
 
 interface SidebarProps {
   activeTab: string;
@@ -22,7 +22,10 @@ const Sidebar: React.FC<SidebarProps> = ({
     { id: 'dashboard', label: 'Neural Overview', icon: LayoutDashboard },
     { id: 'wallets', label: 'Vault Access', icon: Wallet },
     { id: 'transactions', label: 'Ledger History', icon: CreditCard },
-    { id: 'insights', label: 'AI Core', icon: Sparkles },
+    { id: 'suggestions', label: 'AI Advisor', icon: Lightbulb },
+    { id: 'investments', label: 'Investment Plans', icon: TrendingUp },
+    { id: 'profile', label: 'User Profile', icon: User },
+    { id: 'settings', label: 'Settings', icon: SettingsIcon },
   ];
 
   const handleNavClick = (id: string) => {
