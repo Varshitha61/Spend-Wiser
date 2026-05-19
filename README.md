@@ -1,4 +1,4 @@
-# 🎯 SpendWiser - Complete Financial Management App
+# 🎯 SpendWiser - MERN Stack Financial Management App
 
 ## 🚀 Deployment (Vercel Ready)
 
