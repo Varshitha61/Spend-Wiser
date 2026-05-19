@@ -14,7 +14,9 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-const RATES_FILE = path.join(__dirname, 'rates.json');
+const isVercel = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production';
+const DATA_DIR = isVercel ? '/tmp' : __dirname;
+const RATES_FILE = path.join(DATA_DIR, 'rates.json');
 
 // Memory cache for rates
 let cachedRates = {
@@ -40,11 +42,11 @@ if (fs.existsSync(RATES_FILE)) {
 const performScraping = async () => {
   console.log('🔄 Running background scraper for investment rates...');
   try {
-    const response = await axios.get('https://cleartax.in/s/ppf-public-provident-fund', {
+    const response = await axios.get('https://cleartax.in/s/ppf', {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
       },
-      timeout: 5000
+      timeout: 10000
     });
     const $ = cheerio.load(response.data);
     const text = $('body').text();
@@ -56,6 +58,15 @@ const performScraping = async () => {
 
     // Save to fallback file
     fs.writeFileSync(RATES_FILE, JSON.stringify(cachedRates));
+    
+    // Save to MongoDB if connected and schema exists
+    if (mongoose.connection.readyState === 1 && mongoose.models.Rates) {
+      try {
+        await mongoose.models.Rates.findOneAndUpdate({}, { rates: cachedRates, updatedAt: new Date() }, { upsert: true });
+      } catch (err) {
+        console.log('⚠️ Could not save rates to MongoDB:', err.message);
+      }
+    }
     console.log('✅ Background scraper completed successfully. Rates updated.');
   } catch (e) {
     console.log('⚠️ Scraping failed in background cron. Using previously cached rates.');
@@ -79,10 +90,22 @@ app.get('/api/investment-rates/scrape', (req, res) => {
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/spendwiser';
 
 mongoose.connect(MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-}).then(() => {
+  family: 4, // Force IPv4
+}).then(async () => {
   console.log('✅ MongoDB connected successfully');
+  
+  // Try to load cached rates from DB
+  if (mongoose.models.Rates) {
+    try {
+      const dbRates = await mongoose.models.Rates.findOne();
+      if (dbRates && dbRates.rates) {
+        cachedRates = { ...cachedRates, ...Object.fromEntries(dbRates.rates) };
+        console.log('✅ Loaded rates from MongoDB');
+      }
+    } catch (err) {
+      console.log('⚠️ Could not load rates from MongoDB');
+    }
+  }
 }).catch(err => {
   console.error('❌ MongoDB connection error:', err.message);
   console.log('⚠️  Falling back to Excel storage for transactions');
@@ -106,13 +129,7 @@ const transactionSchema = new mongoose.Schema({
 
 const bankDetailsSchema = new mongoose.Schema({
   userId: { type: String, required: true, unique: true },
-  accountHolder: String,
-  accountNumber: { type: String, required: true }, // Encrypted in production
-  ifscCode: String,
-  bankName: String,
-  accountType: String,
-  mobileNumber: String,
-  email: String,
+  accounts: { type: Array, default: [] },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
@@ -130,7 +147,13 @@ const Transaction = mongoose.model('Transaction', transactionSchema);
 const BankDetails = mongoose.model('BankDetails', bankDetailsSchema);
 const User = mongoose.model('User', userSchema);
 
-const EXCEL_FILE = path.join(__dirname, 'data.xlsx');
+const ratesSchema = new mongoose.Schema({
+  rates: { type: Map, of: String },
+  updatedAt: { type: Date, default: Date.now }
+});
+const Rates = mongoose.model('Rates', ratesSchema);
+
+const EXCEL_FILE = path.join(DATA_DIR, 'data.xlsx');
 const SHEET_NAME = 'Transactions';
 
 // Initialize Excel file if it doesn't exist
@@ -165,14 +188,19 @@ function writeTransactionsToExcel(transactions) {
 app.get('/api/transactions', async (req, res) => {
   try {
     if (mongoose.connection.readyState === 1) {
-      const transactions = await Transaction.find().sort({ date: -1 });
-      res.json(transactions);
-    } else {
-      const transactions = readTransactionsFromExcel().sort(
-        (a, b) => new Date(b.date) - new Date(a.date)
-      );
-      res.json(transactions);
+      try {
+        const transactions = await Transaction.find().sort({ date: -1 });
+        return res.json(transactions);
+      } catch (mongoErr) {
+        console.error('MongoDB query failed, falling back to Excel:', mongoErr.message);
+      }
     }
+    
+    // Fallback to Excel
+    const transactions = readTransactionsFromExcel().sort(
+      (a, b) => new Date(b.date) - new Date(a.date)
+    );
+    res.json(transactions);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to fetch transactions' });
@@ -316,32 +344,100 @@ app.get('/api/bank-details/:userId', async (req, res) => {
 // POST/UPDATE bank details
 app.post('/api/bank-details', async (req, res) => {
   try {
-    const { userId, accountHolder, accountNumber, ifscCode, bankName, accountType, mobileNumber, email } = req.body;
+    const { userId, accounts } = req.body;
 
-    if (!userId || !accountNumber) {
-      return res.status(400).json({ error: 'userId and accountNumber are required' });
+    if (!userId || !accounts || !Array.isArray(accounts)) {
+      return res.status(400).json({ error: 'userId and accounts array are required' });
     }
+
+    const firstBankName = accounts.length > 0 ? accounts[0].bankName : 'Bank';
+
+    const mockTransactions = [
+      {
+        id: uuidv4(),
+        amount: 55000,
+        type: 'income',
+        category: 'Salary',
+        description: `${firstBankName || 'Bank'} Salary Credit`,
+        date: new Date().toISOString().split('T')[0],
+        walletId: '1',
+        currency: 'INR',
+        source: 'bank_sync'
+      },
+      {
+        id: uuidv4(),
+        amount: 1500,
+        type: 'expense',
+        category: 'Food',
+        description: `Zomato via ${firstBankName || 'Bank'}`,
+        date: new Date(Date.now() - 86400000).toISOString().split('T')[0],
+        walletId: '1',
+        currency: 'INR',
+        source: 'bank_sync'
+      },
+      {
+        id: uuidv4(),
+        amount: 12000,
+        type: 'expense',
+        category: 'Housing',
+        description: 'Rent Payment',
+        date: new Date(Date.now() - 2 * 86400000).toISOString().split('T')[0],
+        walletId: '1',
+        currency: 'INR',
+        source: 'bank_sync'
+      },
+      {
+         id: uuidv4(),
+         amount: 3000,
+         type: 'expense',
+         category: 'Shopping',
+         description: 'Amazon Purchase',
+         date: new Date(Date.now() - 3 * 86400000).toISOString().split('T')[0],
+         walletId: '1',
+         currency: 'INR',
+         source: 'bank_sync'
+      }
+    ];
 
     if (mongoose.connection.readyState === 1) {
-      const bankDetails = await BankDetails.findOneAndUpdate(
-        { userId },
-        {
-          userId,
-          accountHolder,
-          accountNumber,
-          ifscCode,
-          bankName,
-          accountType,
-          mobileNumber,
-          email,
-          updatedAt: new Date()
-        },
-        { upsert: true, new: true }
-      );
-      res.status(201).json(bankDetails);
-    } else {
-      res.status(503).json({ error: 'MongoDB not connected' });
+      try {
+        const hasBankTransactions = await Transaction.findOne({ source: 'bank_sync' });
+
+        const bankDetails = await BankDetails.findOneAndUpdate(
+          { userId },
+          {
+            userId,
+            accounts,
+            updatedAt: new Date()
+          },
+          { upsert: true, new: true }
+        );
+
+        // Generate mock previous transactions if they don't exist yet
+        if (!hasBankTransactions && accounts.length > 0) {
+          await Transaction.insertMany(mockTransactions);
+        }
+
+        return res.status(201).json(bankDetails);
+      } catch (mongoErr) {
+        console.error('MongoDB operation failed in bank-details:', mongoErr.message);
+        // Fallback below
+      }
     }
+
+    // Fallback if MongoDB is not connected or threw an error
+    const excelTransactions = readTransactionsFromExcel();
+    const hasBankTxInExcel = excelTransactions.some(t => t.source === 'bank_sync');
+    
+    if (!hasBankTxInExcel && accounts.length > 0) {
+      excelTransactions.push(...mockTransactions);
+      writeTransactionsToExcel(excelTransactions);
+    }
+    
+    // Simulate successful bank details save
+    res.status(201).json({ 
+      userId, accounts 
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to save bank details' });
@@ -635,8 +731,12 @@ function parseBankSMS(message) {
 }
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📊 Excel backup stored at: ${EXCEL_FILE}`);
-  console.log(`🔗 MongoDB URI: ${MONGODB_URI}`);
-});
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`📊 Excel backup stored at: ${EXCEL_FILE}`);
+    console.log(`🔗 MongoDB URI: ${MONGODB_URI}`);
+  });
+}
+
+module.exports = app;

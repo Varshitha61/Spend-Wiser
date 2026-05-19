@@ -14,6 +14,9 @@ SpendWiser is now configured for a seamless deployment on **Vercel**:
         - `MONGODB_URI`: Your MongoDB Atlas connection string.
         - `VITE_GEMINI_API_KEY`: Your Google Gemini API Key.
 
+> [!TIP]
+> If you see `ECONNREFUSED` when running locally, change your computer's DNS settings to **Google DNS (8.8.8.8)**. Some ISPs block MongoDB SRV records.
+
 ---
 
 ## 📚 Documentation Files

@@ -96,6 +96,9 @@ const App: React.FC = () => {
         };
 
         fetchTransactions();
+
+        window.addEventListener('refreshTransactions', fetchTransactions);
+        return () => window.removeEventListener('refreshTransactions', fetchTransactions);
     }, []);
 
 
