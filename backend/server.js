@@ -111,47 +111,10 @@ mongoose.connect(MONGODB_URI, {
   console.log('⚠️  Falling back to Excel storage for transactions');
 });
 
-// MongoDB Schemas
-const transactionSchema = new mongoose.Schema({
-  id: { type: String, unique: true, default: () => uuidv4() },
-  amount: Number,
-  type: String, // 'income' or 'expense'
-  category: String,
-  description: String,
-  date: String,
-  walletId: String,
-  currency: { type: String, default: 'INR' },
-  source: { type: String, default: 'manual' }, // 'manual', 'sms', 'api'
-  smsFrom: String,
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now },
-});
-
-const bankDetailsSchema = new mongoose.Schema({
-  userId: { type: String, required: true, unique: true },
-  accounts: { type: Array, default: [] },
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now },
-});
-
-const userSchema = new mongoose.Schema({
-  id: { type: String, unique: true, required: true },
-  email: { type: String, unique: true, required: true, lowercase: true },
-  password: { type: String, required: true }, // In production, use bcrypt
-  name: String,
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now },
-});
-
-const Transaction = mongoose.model('Transaction', transactionSchema);
-const BankDetails = mongoose.model('BankDetails', bankDetailsSchema);
-const User = mongoose.model('User', userSchema);
-
-const ratesSchema = new mongoose.Schema({
-  rates: { type: Map, of: String },
-  updatedAt: { type: Date, default: Date.now }
-});
-const Rates = mongoose.model('Rates', ratesSchema);
+const Transaction = require('./models/Transaction');
+const BankDetails = require('./models/BankDetails');
+const User = require('./models/User');
+const Rates = require('./models/Rates');
 
 const EXCEL_FILE = path.join(DATA_DIR, 'data.xlsx');
 const SHEET_NAME = 'Transactions';
