@@ -236,7 +236,7 @@ const App: React.FC = () => {
                             </h1>
                             <div className="flex items-center gap-3 mt-2">
                                 <div className="h-0.5 w-12 bg-indigo-600 rounded-full animate-pulse"></div>
-                                <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.4em]">SpendWiser • Excel Storage</p>
+                                <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.4em]">SpendWiser • Cloud Storage</p>
                             </div>
                         </div>
                         <div className="flex flex-wrap items-center gap-2 md:gap-4 animate-reveal" style={{ animationDelay: '400ms' }}>
