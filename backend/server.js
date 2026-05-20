@@ -60,7 +60,7 @@ const performScraping = async () => {
     fs.writeFileSync(RATES_FILE, JSON.stringify(cachedRates));
     
     // Save to MongoDB if connected and schema exists
-    if (mongoose.connection.readyState === 1 && mongoose.models.Rates) {
+    if ((mongoose.connection.readyState === 1 || mongoose.connection.readyState === 2) && mongoose.models.Rates) {
       try {
         await mongoose.models.Rates.findOneAndUpdate({}, { rates: cachedRates, updatedAt: new Date() }, { upsert: true });
       } catch (err) {
@@ -150,7 +150,7 @@ function writeTransactionsToExcel(transactions) {
 // GET all transactions (from MongoDB if connected, else Excel)
 app.get('/api/transactions', async (req, res) => {
   try {
-    if (mongoose.connection.readyState === 1) {
+    if ((mongoose.connection.readyState === 1 || mongoose.connection.readyState === 2)) {
       try {
         const transactions = await Transaction.find().sort({ date: -1 });
         return res.json(transactions);
@@ -188,7 +188,7 @@ app.post('/api/transactions', async (req, res) => {
     };
 
     // Save to MongoDB if connected
-    if (mongoose.connection.readyState === 1) {
+    if ((mongoose.connection.readyState === 1 || mongoose.connection.readyState === 2)) {
       const tx = new Transaction(newTransaction);
       await tx.save();
       res.status(201).json(tx);
@@ -210,7 +210,7 @@ app.delete('/api/transactions/:id', async (req, res) => {
   try {
     const { id } = req.params;
 
-    if (mongoose.connection.readyState === 1) {
+    if ((mongoose.connection.readyState === 1 || mongoose.connection.readyState === 2)) {
       const result = await Transaction.findOneAndDelete({ id });
       if (!result) {
         return res.status(404).json({ error: 'Transaction not found' });
@@ -236,7 +236,7 @@ app.put('/api/transactions/:id', async (req, res) => {
   try {
     const { id } = req.params;
 
-    if (mongoose.connection.readyState === 1) {
+    if ((mongoose.connection.readyState === 1 || mongoose.connection.readyState === 2)) {
       const updated = await Transaction.findOneAndUpdate(
         { id },
         { ...req.body, updatedAt: new Date() },
@@ -265,7 +265,7 @@ app.put('/api/transactions/:id', async (req, res) => {
 // DELETE all transactions (Clear Data)
 app.delete('/api/data/clear', async (req, res) => {
   try {
-    if (mongoose.connection.readyState === 1) {
+    if ((mongoose.connection.readyState === 1 || mongoose.connection.readyState === 2)) {
       await Transaction.deleteMany({});
       res.json({ message: 'All data cleared' });
     } else {
@@ -289,7 +289,7 @@ app.get('/api/bank-details/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
 
-    if (mongoose.connection.readyState === 1) {
+    if ((mongoose.connection.readyState === 1 || mongoose.connection.readyState === 2)) {
       const bankDetails = await BankDetails.findOne({ userId });
       if (!bankDetails) {
         return res.status(404).json({ error: 'Bank details not found' });
@@ -362,7 +362,7 @@ app.post('/api/bank-details', async (req, res) => {
       }
     ];
 
-    if (mongoose.connection.readyState === 1) {
+    if ((mongoose.connection.readyState === 1 || mongoose.connection.readyState === 2)) {
       try {
         const hasBankTransactions = await Transaction.findOne({ source: 'bank_sync' });
 
@@ -412,7 +412,7 @@ app.delete('/api/bank-details/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
 
-    if (mongoose.connection.readyState === 1) {
+    if ((mongoose.connection.readyState === 1 || mongoose.connection.readyState === 2)) {
       const result = await BankDetails.findOneAndDelete({ userId });
       if (!result) {
         return res.status(404).json({ error: 'Bank details not found' });
@@ -438,7 +438,7 @@ app.post('/api/auth/register', async (req, res) => {
       return res.status(400).json({ error: 'Email, password, and name are required' });
     }
 
-    if (mongoose.connection.readyState === 1) {
+    if ((mongoose.connection.readyState === 1 || mongoose.connection.readyState === 2)) {
       // Check if user already exists
       const existingUser = await User.findOne({ email: email.toLowerCase() });
       if (existingUser) {
@@ -481,7 +481,7 @@ app.post('/api/auth/login', async (req, res) => {
       return res.status(400).json({ error: 'Email and password are required' });
     }
 
-    if (mongoose.connection.readyState === 1) {
+    if ((mongoose.connection.readyState === 1 || mongoose.connection.readyState === 2)) {
       // Find user by email and password
       const user = await User.findOne({
         email: email.toLowerCase(),
@@ -514,7 +514,7 @@ app.get('/api/auth/user/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
 
-    if (mongoose.connection.readyState === 1) {
+    if ((mongoose.connection.readyState === 1 || mongoose.connection.readyState === 2)) {
       const user = await User.findOne({ id: userId });
       if (!user) {
         return res.status(404).json({ error: 'User not found' });
@@ -543,7 +543,7 @@ app.put('/api/auth/user/:userId', async (req, res) => {
     const { userId } = req.params;
     const { name, password } = req.body;
 
-    if (mongoose.connection.readyState === 1) {
+    if ((mongoose.connection.readyState === 1 || mongoose.connection.readyState === 2)) {
       const updateData = {};
       if (name) updateData.name = name;
       if (password) updateData.password = password; // In production, hash this
@@ -604,7 +604,7 @@ app.post('/api/sms/webhook', async (req, res) => {
       smsFrom: from
     };
 
-    if (mongoose.connection.readyState === 1) {
+    if ((mongoose.connection.readyState === 1 || mongoose.connection.readyState === 2)) {
       const tx = new Transaction(newTransaction);
       await tx.save();
       res.status(201).json({ success: true, transaction: tx });
