@@ -2,7 +2,7 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const fs = require('fs');
 const path = require('path');
-const mongoose = require('mongoose');
+const prisma = require('../utils/prisma');
 
 const isVercel = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production';
 const DATA_DIR = isVercel ? '/tmp' : path.join(__dirname, '..');
@@ -31,16 +31,14 @@ function loadCachedRates() {
 }
 
 async function loadRatesFromDB() {
-  if (mongoose.models.Rates) {
-    try {
-      const dbRates = await mongoose.models.Rates.findOne();
-      if (dbRates && dbRates.rates) {
-        cachedRates = { ...cachedRates, ...Object.fromEntries(dbRates.rates) };
-        console.log('✅ Loaded rates from MongoDB');
-      }
-    } catch (err) {
-      console.log('⚠️ Could not load rates from MongoDB');
+  try {
+    const dbRates = await prisma.rates.findFirst();
+    if (dbRates && dbRates.rates) {
+      cachedRates = { ...cachedRates, ...dbRates.rates };
+      console.log('✅ Loaded rates from Prisma DB');
     }
+  } catch (err) {
+    console.log('⚠️ Could not load rates from Prisma DB');
   }
 }
 
@@ -65,13 +63,21 @@ const performScraping = async () => {
     // Save to fallback file
     fs.writeFileSync(RATES_FILE, JSON.stringify(cachedRates));
     
-    // Save to MongoDB if connected and schema exists
-    if ((mongoose.connection.readyState === 1 || mongoose.connection.readyState === 2) && mongoose.models.Rates) {
-      try {
-        await mongoose.models.Rates.findOneAndUpdate({}, { rates: cachedRates, updatedAt: new Date() }, { upsert: true });
-      } catch (err) {
-        console.log('⚠️ Could not save rates to MongoDB:', err.message);
+    // Save to DB
+    try {
+      const existing = await prisma.rates.findFirst();
+      if (existing) {
+        await prisma.rates.update({
+          where: { id: existing.id },
+          data: { rates: cachedRates }
+        });
+      } else {
+        await prisma.rates.create({
+          data: { rates: cachedRates }
+        });
       }
+    } catch (err) {
+      console.log('⚠️ Could not save rates to Prisma DB:', err.message);
     }
     console.log('✅ Background scraper completed successfully. Rates updated.');
   } catch (e) {

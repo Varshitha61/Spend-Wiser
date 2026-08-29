@@ -1,17 +1,16 @@
-const mongoose = require('mongoose');
 const { v4: uuidv4 } = require('uuid');
-const Transaction = require('../models/Transaction');
+const prisma = require('../utils/prisma');
 const { readTransactionsFromExcel, writeTransactionsToExcel, initExcel, EXCEL_FILE } = require('../services/excelService');
 
 exports.getTransactions = async (req, res) => {
   try {
-    if ((mongoose.connection.readyState === 1 || mongoose.connection.readyState === 2)) {
-      try {
-        const transactions = await Transaction.find().sort({ date: -1 });
-        return res.json(transactions);
-      } catch (mongoErr) {
-        console.error('MongoDB query failed, falling back to Excel:', mongoErr.message);
-      }
+    try {
+      const transactions = await prisma.transaction.findMany({
+        orderBy: { date: 'desc' }
+      });
+      return res.json(transactions);
+    } catch (dbErr) {
+      console.error('Prisma query failed, falling back to Excel:', dbErr.message);
     }
     
     // Fallback to Excel
@@ -38,17 +37,18 @@ exports.createTransaction = async (req, res) => {
       date,
       walletId,
       currency: currency || 'INR',
-      createdAt: new Date().toISOString()
     };
 
-    // Save to MongoDB if connected
-    if ((mongoose.connection.readyState === 1 || mongoose.connection.readyState === 2)) {
-      const tx = new Transaction(newTransaction);
-      await tx.save();
+    try {
+      const tx = await prisma.transaction.create({
+        data: newTransaction
+      });
       return res.status(201).json(tx);
-    } else {
+    } catch (dbErr) {
+      console.error('Prisma create failed, falling back to Excel:', dbErr.message);
       // Fallback to Excel
       const transactions = readTransactionsFromExcel();
+      newTransaction.createdAt = new Date().toISOString();
       transactions.push(newTransaction);
       writeTransactionsToExcel(transactions);
       return res.status(201).json(newTransaction);
@@ -63,17 +63,17 @@ exports.updateTransaction = async (req, res) => {
   try {
     const { id } = req.params;
 
-    if ((mongoose.connection.readyState === 1 || mongoose.connection.readyState === 2)) {
-      const updated = await Transaction.findOneAndUpdate(
-        { id },
-        { ...req.body, updatedAt: new Date() },
-        { new: true }
-      );
-      if (!updated) {
+    try {
+      const updated = await prisma.transaction.update({
+        where: { id },
+        data: req.body,
+      });
+      return res.json(updated);
+    } catch (dbErr) {
+      console.error('Prisma update failed, falling back to Excel:', dbErr.message);
+      if (dbErr.code === 'P2025') {
         return res.status(404).json({ error: 'Transaction not found' });
       }
-      return res.json(updated);
-    } else {
       const transactions = readTransactionsFromExcel();
       const index = transactions.findIndex(t => t.id === id);
       if (index === -1) {
@@ -93,13 +93,16 @@ exports.deleteTransaction = async (req, res) => {
   try {
     const { id } = req.params;
 
-    if ((mongoose.connection.readyState === 1 || mongoose.connection.readyState === 2)) {
-      const result = await Transaction.findOneAndDelete({ id });
-      if (!result) {
+    try {
+      await prisma.transaction.delete({
+        where: { id }
+      });
+      return res.json({ message: 'Transaction deleted' });
+    } catch (dbErr) {
+      console.error('Prisma delete failed, falling back to Excel:', dbErr.message);
+      if (dbErr.code === 'P2025') {
         return res.status(404).json({ error: 'Transaction not found' });
       }
-      return res.json({ message: 'Transaction deleted' });
-    } else {
       const transactions = readTransactionsFromExcel();
       const filtered = transactions.filter(t => t.id !== id);
       if (filtered.length === transactions.length) {
@@ -116,10 +119,11 @@ exports.deleteTransaction = async (req, res) => {
 
 exports.clearAllTransactions = async (req, res) => {
   try {
-    if ((mongoose.connection.readyState === 1 || mongoose.connection.readyState === 2)) {
-      await Transaction.deleteMany({});
+    try {
+      await prisma.transaction.deleteMany({});
       return res.json({ message: 'All data cleared' });
-    } else {
+    } catch (dbErr) {
+      console.error('Prisma deleteMany failed, falling back to Excel:', dbErr.message);
       initExcel();
       const XLSX = require('xlsx');
       const wb = XLSX.utils.book_new();

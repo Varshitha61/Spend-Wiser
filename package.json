@@ -7,10 +7,12 @@
     "dev:client": "npm run dev --prefix client",
     "dev:backend": "npm run start --prefix backend",
     "build": "npm install --prefix client && npm run build --prefix client",
-    "install:all": "npm install && npm install --prefix client && npm install --prefix backend"
+    "install:all": "npm install && npm install --prefix client && npm install --prefix backend",
+    "postinstall": "prisma generate --schema=backend/prisma/schema.prisma"
   },
   "dependencies": {
     "@google/genai": "^1.30.0",
+    "@prisma/client": "^7.10.0",
     "axios": "^1.15.2",
     "bcryptjs": "^2.4.3",
     "cheerio": "^1.2.0",
@@ -21,7 +23,6 @@
     "joi": "^17.11.0",
     "jsonwebtoken": "^9.0.0",
     "lucide-react": "^0.554.0",
-    "mongoose": "^8.0.0",
     "node-cron": "^4.2.1",
     "nodemailer": "^8.0.7",
     "react": "^19.2.0",

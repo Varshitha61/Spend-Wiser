@@ -1,25 +1,22 @@
-const mongoose = require('mongoose');
 const { v4: uuidv4 } = require('uuid');
-const BankDetails = require('../models/BankDetails');
-const Transaction = require('../models/Transaction');
+const prisma = require('../utils/prisma');
 const { readTransactionsFromExcel, writeTransactionsToExcel } = require('../services/excelService');
 
 exports.getBankDetails = async (req, res) => {
   try {
     const { userId } = req.params;
 
-    if ((mongoose.connection.readyState === 1 || mongoose.connection.readyState === 2)) {
-      const bankDetails = await BankDetails.findOne({ userId });
+    try {
+      const bankDetails = await prisma.bankDetails.findUnique({
+        where: { userId }
+      });
       if (!bankDetails) {
         return res.status(404).json({ error: 'Bank details not found' });
       }
       return res.json(bankDetails);
-    } else {
-      const { getLastError } = require('../utils/db');
-      const err = getLastError();
-      return res.status(503).json({ 
-        error: `MongoDB not connected. ${err ? err.message : 'Please check your connection settings.'}` 
-      });
+    } catch (dbErr) {
+      console.error('Prisma query failed:', dbErr.message);
+      return res.status(503).json({ error: 'Database error' });
     }
   } catch (err) {
     console.error(err);
@@ -80,41 +77,40 @@ exports.updateBankDetails = async (req, res) => {
       }
     ];
 
-    if ((mongoose.connection.readyState === 1 || mongoose.connection.readyState === 2)) {
-      try {
-        const hasBankTransactions = await Transaction.findOne({ source: 'bank_sync' });
+    try {
+      const hasBankTransactions = await prisma.transaction.findFirst({
+        where: { source: 'bank_sync' }
+      });
 
-        const bankDetails = await BankDetails.findOneAndUpdate(
-          { userId },
-          {
-            userId,
-            accounts,
-            updatedAt: new Date()
-          },
-          { upsert: true, new: true }
-        );
+      const bankDetails = await prisma.bankDetails.upsert({
+        where: { userId },
+        update: { accounts },
+        create: { userId, accounts }
+      });
 
-        if (!hasBankTransactions && accounts.length > 0) {
-          await Transaction.insertMany(mockTransactions);
-        }
-
-        return res.status(201).json(bankDetails);
-      } catch (mongoErr) {
-        console.error('MongoDB operation failed in bank-details:', mongoErr.message);
+      if (!hasBankTransactions && accounts.length > 0) {
+        await prisma.transaction.createMany({
+          data: mockTransactions
+        });
       }
+
+      return res.status(201).json(bankDetails);
+    } catch (mongoErr) {
+      console.error('Prisma operation failed in bank-details:', mongoErr.message);
+      
+      const excelTransactions = readTransactionsFromExcel();
+      const hasBankTxInExcel = excelTransactions.some(t => t.source === 'bank_sync');
+      
+      if (!hasBankTxInExcel && accounts.length > 0) {
+        excelTransactions.push(...mockTransactions);
+        writeTransactionsToExcel(excelTransactions);
+      }
+      
+      return res.status(201).json({ 
+        userId, accounts 
+      });
     }
 
-    const excelTransactions = readTransactionsFromExcel();
-    const hasBankTxInExcel = excelTransactions.some(t => t.source === 'bank_sync');
-    
-    if (!hasBankTxInExcel && accounts.length > 0) {
-      excelTransactions.push(...mockTransactions);
-      writeTransactionsToExcel(excelTransactions);
-    }
-    
-    return res.status(201).json({ 
-      userId, accounts 
-    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to save bank details' });
@@ -125,18 +121,17 @@ exports.deleteBankDetails = async (req, res) => {
   try {
     const { userId } = req.params;
 
-    if ((mongoose.connection.readyState === 1 || mongoose.connection.readyState === 2)) {
-      const result = await BankDetails.findOneAndDelete({ userId });
-      if (!result) {
-        return res.status(404).json({ error: 'Bank details not found' });
-      }
-      return res.json({ message: 'Bank details deleted' });
-    } else {
-      const { getLastError } = require('../utils/db');
-      const err = getLastError();
-      return res.status(503).json({ 
-        error: `MongoDB not connected. ${err ? err.message : 'Please check your connection settings.'}` 
+    try {
+      await prisma.bankDetails.delete({
+        where: { userId }
       });
+      return res.json({ message: 'Bank details deleted' });
+    } catch (dbErr) {
+      console.error('Prisma query failed:', dbErr.message);
+      if (dbErr.code === 'P2025') {
+         return res.status(404).json({ error: 'Bank details not found' });
+      }
+      return res.status(503).json({ error: 'Database error' });
     }
   } catch (err) {
     console.error(err);

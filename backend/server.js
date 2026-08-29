@@ -1,9 +1,9 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const mongoose = require('mongoose');
 const cron = require('node-cron');
 const path = require('path');
+const prisma = require('./utils/prisma');
 
 // Import middleware
 const { apiLimiter } = require('./middleware/rateLimiter');
@@ -50,23 +50,9 @@ app.get('/api/investment-rates/scrape', (req, res) => {
   res.json(getCachedRates());
 });
 
-const { connectDB } = require('./utils/db');
-
-// Database connection middleware for all API requests
-app.use('/api', async (req, res, next) => {
-  try {
-    await connectDB();
-  } catch (err) {
-    // Catch error to allow controllers to use fallback Excel storage if appropriate
-  }
-  next();
-});
-
-// MongoDB Connection (starts async at boot time)
-connectDB().then(async () => {
-  await loadRatesFromDB();
-}).catch(err => {
-  console.error('⚠️ MongoDB initial connection failed:', err.message);
+// Load rates from Prisma DB on startup
+loadRatesFromDB().catch(err => {
+  console.error('⚠️ Prisma initial connection failed:', err.message);
 });
 
 // Register API Routes
@@ -86,7 +72,7 @@ if (process.env.NODE_ENV !== 'production') {
   app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
     console.log(`📊 Excel backup stored at: ${EXCEL_FILE}`);
-    console.log(`🔗 MongoDB URI: ${process.env.MONGODB_URI || 'mongodb://localhost:27017/spendwiser'}`);
+    console.log(`🔗 Prisma Postgres URI configured via env`);
   });
 }
 
