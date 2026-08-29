@@ -57,9 +57,13 @@ const UserProfileView: React.FC<UserProfileViewProps> = ({ user, onUpdate }) => 
   const handleSaveBankDetails = async () => {
     try {
       const userId = user?.id || 'default-user';
+      const token = localStorage.getItem('smartspend_token');
       const response = await fetch('/api/bank-details', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : ''
+        },
         body: JSON.stringify({
           userId,
           accounts: editedBankDetailsList
@@ -72,14 +76,15 @@ const UserProfileView: React.FC<UserProfileViewProps> = ({ user, onUpdate }) => 
         alert('Bank details saved securely. Fetching previous transactions...');
         window.dispatchEvent(new Event('refreshTransactions'));
       } else {
-        alert('Failed to save bank details. Check if MongoDB is running.');
+        const errData = await response.json().catch(() => ({}));
+        alert(`Failed to save bank details: ${errData.error || 'Server error'}`);
       }
     } catch (err) {
       console.error('Error saving bank details:', err);
       // Fallback to localStorage
       setBankDetailsList(editedBankDetailsList);
       setIsBankEditing(false);
-      alert('Saved locally (MongoDB unavailable)');
+      alert('Saved locally due to connection error.');
     }
   };
 

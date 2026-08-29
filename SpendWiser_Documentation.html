@@ -1,0 +1,1905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SpendWiser – Complete Technical Documentation</title>
+  <style>
+    /* ─── PRINT + PDF SETTINGS ─────────────────────────────── */
+    @page {
+      size: A4;
+      margin: 20mm 18mm 20mm 18mm;
+    }
+    @media print {
+      .no-print { display: none !important; }
+      body { font-size: 11pt; }
+      h1 { font-size: 22pt; }
+      h2 { font-size: 16pt; }
+      h3 { font-size: 13pt; }
+      h4 { font-size: 11pt; }
+      .page-break { page-break-before: always; }
+      section { page-break-inside: avoid; }
+      pre { page-break-inside: avoid; }
+    }
+
+    /* ─── BASE ──────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --indigo:   #4f46e5;
+      --indigo-light: #818cf8;
+      --emerald:  #10b981;
+      --rose:     #f43f5e;
+      --amber:    #f59e0b;
+      --slate-900: #0f172a;
+      --slate-800: #1e293b;
+      --slate-700: #334155;
+      --slate-600: #475569;
+      --slate-400: #94a3b8;
+      --slate-200: #e2e8f0;
+      --white:     #ffffff;
+      --bg:        #f8fafc;
+      --text:      #1e293b;
+      --muted:     #64748b;
+      --border:    #e2e8f0;
+      --code-bg:   #1e293b;
+      --code-text: #e2e8f0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      font-size: 12pt;
+    }
+
+    /* ─── LAYOUT ────────────────────────────────────────────── */
+    .container { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+
+    /* ─── COVER PAGE ────────────────────────────────────────── */
+    .cover {
+      background: linear-gradient(135deg, var(--slate-900) 0%, #1e1b4b 50%, #0f172a 100%);
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 48px 24px;
+    }
+    .cover .logo {
+      width: 100px; height: 100px;
+      background: var(--indigo);
+      border-radius: 28px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 48px; font-weight: 900;
+      margin: 0 auto 32px;
+      box-shadow: 0 0 60px rgba(79,70,229,0.5);
+    }
+    .cover h1 { font-size: 48px; font-weight: 900; letter-spacing: -2px; margin-bottom: 8px; }
+    .cover .subtitle { font-size: 15px; color: #94a3b8; text-transform: uppercase; letter-spacing: 4px; margin-bottom: 40px; }
+    .cover .badges { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 48px; }
+    .badge {
+      padding: 6px 16px; border-radius: 100px;
+      font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;
+    }
+    .badge-indigo  { background: rgba(99,102,241,.2); border: 1px solid rgba(99,102,241,.4); color: #a5b4fc; }
+    .badge-emerald { background: rgba(16,185,129,.2); border: 1px solid rgba(16,185,129,.4); color: #6ee7b7; }
+    .badge-amber   { background: rgba(245,158,11,.2); border: 1px solid rgba(245,158,11,.4); color: #fde68a; }
+    .badge-rose    { background: rgba(244,63,94,.2);  border: 1px solid rgba(244,63,94,.4);  color: #fca5a5; }
+    .cover .meta { color: #64748b; font-size: 13px; }
+    .cover .meta span { margin: 0 12px; }
+
+    /* ─── TABLE OF CONTENTS ─────────────────────────────────── */
+    .toc-page {
+      background: white;
+      padding: 64px 48px;
+      page-break-before: always;
+    }
+    .toc-page h2 { font-size: 28px; color: var(--indigo); margin-bottom: 32px; border-bottom: 3px solid var(--indigo); padding-bottom: 12px; }
+    .toc-list { list-style: none; }
+    .toc-list li { padding: 6px 0; border-bottom: 1px dashed var(--border); display: flex; justify-content: space-between; }
+    .toc-list li a { text-decoration: none; color: var(--text); font-weight: 600; }
+    .toc-list li a:hover { color: var(--indigo); }
+    .toc-list .toc-section { font-weight: 800; color: var(--indigo); margin-top: 16px; font-size: 13pt; }
+    .toc-list .toc-sub { padding-left: 24px; font-size: 11pt; color: var(--muted); }
+
+    /* ─── MAIN CONTENT ──────────────────────────────────────── */
+    .doc-page {
+      background: white;
+      padding: 64px 48px;
+      page-break-before: always;
+    }
+
+    h1 { font-size: 32px; font-weight: 900; color: var(--indigo); margin-bottom: 16px; letter-spacing: -1px; }
+    h2 { font-size: 22px; font-weight: 800; color: var(--slate-900); margin: 40px 0 16px; padding-bottom: 8px; border-bottom: 2px solid var(--border); }
+    h3 { font-size: 16px; font-weight: 700; color: var(--slate-800); margin: 28px 0 10px; }
+    h4 { font-size: 13px; font-weight: 700; color: var(--indigo); margin: 20px 0 8px; text-transform: uppercase; letter-spacing: 1px; }
+
+    p  { margin-bottom: 12px; }
+    ul, ol { margin: 8px 0 16px 24px; }
+    li { margin-bottom: 6px; }
+    strong { color: var(--slate-900); }
+
+    /* ─── CALLOUTS ──────────────────────────────────────────── */
+    .callout {
+      border-radius: 12px; padding: 16px 20px;
+      margin: 20px 0; font-size: 11pt;
+      border-left: 4px solid;
+    }
+    .callout-info    { background: #eff6ff; border-color: #3b82f6; color: #1e3a5f; }
+    .callout-success { background: #f0fdf4; border-color: var(--emerald); color: #14532d; }
+    .callout-warning { background: #fffbeb; border-color: var(--amber); color: #78350f; }
+    .callout-danger  { background: #fff1f2; border-color: var(--rose); color: #881337; }
+    .callout-label { font-weight: 800; text-transform: uppercase; letter-spacing: 1px; font-size: 10pt; margin-bottom: 4px; }
+
+    /* ─── CODE BLOCKS ───────────────────────────────────────── */
+    pre {
+      background: var(--code-bg);
+      color: var(--code-text);
+      border-radius: 12px;
+      padding: 20px 24px;
+      overflow-x: auto;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 10pt;
+      line-height: 1.6;
+      margin: 16px 0;
+    }
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background: #f1f5f9;
+      color: var(--rose);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10pt;
+    }
+    pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+
+    /* ─── TABLES ────────────────────────────────────────────── */
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 11pt; }
+    th { background: var(--slate-900); color: white; padding: 12px 16px; text-align: left; font-size: 10pt; text-transform: uppercase; letter-spacing: 1px; }
+    td { padding: 10px 16px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    tr:nth-child(even) td { background: #f8fafc; }
+
+    /* ─── SPEC BLOCKS ───────────────────────────────────────── */
+    .spec-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
+    .spec-card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      background: #fafafa;
+    }
+    .spec-card .spec-label { font-size: 9pt; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-bottom: 6px; }
+    .spec-card .spec-value { font-size: 13pt; font-weight: 700; color: var(--slate-900); }
+    .spec-card .spec-sub { font-size: 10pt; color: var(--muted); margin-top: 4px; }
+
+    /* ─── FLOW DIAGRAM ──────────────────────────────────────── */
+    .flow {
+      display: flex; align-items: center; gap: 8px;
+      flex-wrap: wrap;
+      margin: 20px 0; padding: 20px;
+      background: #f1f5f9; border-radius: 12px;
+    }
+    .flow-step {
+      padding: 10px 18px; background: var(--indigo); color: white;
+      border-radius: 8px; font-size: 10pt; font-weight: 700;
+      white-space: nowrap;
+    }
+    .flow-arrow { font-size: 18px; color: var(--muted); }
+
+    /* ─── SECTION BANNER ────────────────────────────────────── */
+    .section-banner {
+      background: linear-gradient(135deg, #1e1b4b, #0f172a);
+      color: white;
+      padding: 32px 40px;
+      border-radius: 16px;
+      margin-bottom: 32px;
+    }
+    .section-banner .banner-tag { font-size: 9pt; font-weight: 800; text-transform: uppercase; letter-spacing: 3px; color: var(--indigo-light); margin-bottom: 8px; }
+    .section-banner h1 { color: white; margin-bottom: 8px; font-size: 28px; }
+    .section-banner p { color: #94a3b8; margin: 0; font-size: 12pt; }
+
+    /* ─── FILE TREE ─────────────────────────────────────────── */
+    .file-tree {
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 10.5pt;
+      background: #0f172a;
+      color: #94a3b8;
+      padding: 24px 28px;
+      border-radius: 12px;
+      line-height: 1.8;
+    }
+    .file-tree .dir  { color: #818cf8; font-weight: 700; }
+    .file-tree .file { color: #6ee7b7; }
+    .file-tree .note { color: #475569; }
+
+    /* ─── ENDPOINT BLOCK ────────────────────────────────────── */
+    .endpoint {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin: 16px 0;
+      overflow: hidden;
+    }
+    .endpoint-header {
+      padding: 12px 20px;
+      display: flex; align-items: center; gap: 12px;
+      background: #f8fafc;
+      border-bottom: 1px solid var(--border);
+    }
+    .method {
+      font-size: 9pt; font-weight: 900; padding: 4px 10px;
+      border-radius: 6px; text-transform: uppercase;
+    }
+    .method-get    { background: #d1fae5; color: #065f46; }
+    .method-post   { background: #dbeafe; color: #1e3a8a; }
+    .method-put    { background: #fef3c7; color: #92400e; }
+    .method-delete { background: #fee2e2; color: #7f1d1d; }
+    .endpoint-path { font-family: monospace; font-size: 11pt; font-weight: 700; color: var(--slate-900); }
+    .endpoint-body { padding: 14px 20px; font-size: 11pt; }
+
+    /* ─── PRINT BUTTON ──────────────────────────────────────── */
+    .print-btn {
+      position: fixed; bottom: 32px; right: 32px; z-index: 999;
+      background: var(--indigo); color: white;
+      border: none; border-radius: 100px;
+      padding: 14px 28px; font-size: 13pt; font-weight: 700;
+      cursor: pointer; box-shadow: 0 8px 32px rgba(79,70,229,.4);
+      transition: transform .2s;
+    }
+    .print-btn:hover { transform: scale(1.05); }
+
+    /* ─── DIVIDER ───────────────────────────────────────────── */
+    hr { border: none; border-top: 2px solid var(--border); margin: 36px 0; }
+
+    /* ─── PAGE TAG ──────────────────────────────────────────── */
+    .page-tag {
+      font-size: 9pt; text-transform: uppercase; letter-spacing: 2px;
+      color: var(--muted); margin-bottom: 8px; font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!--  COVER PAGE                                               -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="cover">
+  <div class="logo">S</div>
+  <h1>SpendWiser</h1>
+  <div class="subtitle">Complete Technical Documentation</div>
+  <div class="badges">
+    <span class="badge badge-indigo">MERN Stack</span>
+    <span class="badge badge-emerald">React 19 + TypeScript</span>
+    <span class="badge badge-amber">Google Gemini AI</span>
+    <span class="badge badge-rose">MongoDB + Express</span>
+  </div>
+  <p style="color:#94a3b8; max-width:560px; line-height:1.8; font-size:14px;">
+    A full-stack personal finance management web application featuring AI-powered spending
+    insights, SMS-based transaction parsing, investment recommendations, and multi-wallet
+    tracking — all backed by MongoDB and served with an Express REST API.
+  </p>
+  <br/><br/>
+  <div class="meta">
+    <span>📅 June 2026</span>
+    <span>📄 Software Design Engineer Documentation</span>
+    <span>🔖 Version 2.5.0</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!--  TABLE OF CONTENTS                                        -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="toc-page">
+  <h2>📋 Table of Contents</h2>
+  <ul class="toc-list">
+    <li class="toc-section"><a href="#sec1">1. Project Overview</a></li>
+    <li class="toc-sub"><a href="#sec1-1">1.1 What is SpendWiser?</a></li>
+    <li class="toc-sub"><a href="#sec1-2">1.2 Key Features</a></li>
+    <li class="toc-sub"><a href="#sec1-3">1.3 Technology Stack</a></li>
+
+    <li class="toc-section"><a href="#sec2">2. System Architecture</a></li>
+    <li class="toc-sub"><a href="#sec2-1">2.1 High-Level Architecture</a></li>
+    <li class="toc-sub"><a href="#sec2-2">2.2 Project Folder Structure</a></li>
+    <li class="toc-sub"><a href="#sec2-3">2.3 Data Flow</a></li>
+
+    <li class="toc-section"><a href="#sec3">3. Backend – Express API</a></li>
+    <li class="toc-sub"><a href="#sec3-1">3.1 Entry Point – server.js</a></li>
+    <li class="toc-sub"><a href="#sec3-2">3.2 Database Connection – db.js</a></li>
+    <li class="toc-sub"><a href="#sec3-3">3.3 Database Models</a></li>
+    <li class="toc-sub"><a href="#sec3-4">3.4 API Routes</a></li>
+    <li class="toc-sub"><a href="#sec3-5">3.5 Controllers</a></li>
+    <li class="toc-sub"><a href="#sec3-6">3.6 Middleware</a></li>
+    <li class="toc-sub"><a href="#sec3-7">3.7 Services</a></li>
+    <li class="toc-sub"><a href="#sec3-8">3.8 Utilities</a></li>
+    <li class="toc-sub"><a href="#sec3-9">3.9 Validators</a></li>
+
+    <li class="toc-section"><a href="#sec4">4. Frontend – React Application</a></li>
+    <li class="toc-sub"><a href="#sec4-1">4.1 Main App Component (App.tsx)</a></li>
+    <li class="toc-sub"><a href="#sec4-2">4.2 TypeScript Types</a></li>
+    <li class="toc-sub"><a href="#sec4-3">4.3 Client Services</a></li>
+
+    <li class="toc-section"><a href="#sec5">5. Pages and Components</a></li>
+    <li class="toc-sub"><a href="#sec5-1">5.1 Login / Register Page</a></li>
+    <li class="toc-sub"><a href="#sec5-2">5.2 Sidebar Navigation</a></li>
+    <li class="toc-sub"><a href="#sec5-3">5.3 Dashboard (Neural Overview)</a></li>
+    <li class="toc-sub"><a href="#sec5-4">5.4 Vault Repository (Wallets)</a></li>
+    <li class="toc-sub"><a href="#sec5-5">5.5 Ledger Feed (Transactions)</a></li>
+    <li class="toc-sub"><a href="#sec5-6">5.6 Gemini Core (AI Insights)</a></li>
+    <li class="toc-sub"><a href="#sec5-7">5.7 AI Advisor (Suggestions)</a></li>
+    <li class="toc-sub"><a href="#sec5-8">5.8 Investment Plans</a></li>
+    <li class="toc-sub"><a href="#sec5-9">5.9 User Profile</a></li>
+    <li class="toc-sub"><a href="#sec5-10">5.10 Settings</a></li>
+    <li class="toc-sub"><a href="#sec5-11">5.11 Transaction Modal</a></li>
+    <li class="toc-sub"><a href="#sec5-12">5.12 SMS Parser Modal</a></li>
+
+    <li class="toc-section"><a href="#sec6">6. API Reference</a></li>
+    <li class="toc-sub"><a href="#sec6-1">6.1 Authentication Endpoints</a></li>
+    <li class="toc-sub"><a href="#sec6-2">6.2 Transaction Endpoints</a></li>
+    <li class="toc-sub"><a href="#sec6-3">6.3 Bank Details Endpoints</a></li>
+    <li class="toc-sub"><a href="#sec6-4">6.4 SMS Webhook</a></li>
+    <li class="toc-sub"><a href="#sec6-5">6.5 Investment Rates</a></li>
+
+    <li class="toc-section"><a href="#sec7">7. Security</a></li>
+    <li class="toc-section"><a href="#sec8">8. Data Storage & Backup</a></li>
+    <li class="toc-section"><a href="#sec9">9. Deployment</a></li>
+    <li class="toc-section"><a href="#sec10">10. Setup & Installation Guide</a></li>
+    <li class="toc-section"><a href="#sec11">11. Environment Variables</a></li>
+    <li class="toc-section"><a href="#sec12">12. Troubleshooting</a></li>
+  </ul>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!--  SECTION 1 – PROJECT OVERVIEW                             -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="doc-page" id="sec1">
+  <div class="section-banner">
+    <div class="banner-tag">Section 1</div>
+    <h1>Project Overview</h1>
+    <p>Understanding what SpendWiser is, what it does, and the core technologies used.</p>
+  </div>
+
+  <h2 id="sec1-1">1.1 What is SpendWiser?</h2>
+  <p>
+    <strong>SpendWiser</strong> is a full-stack, AI-powered personal finance management application built
+    using the <strong>MERN stack</strong> (MongoDB, Express, React, Node.js). It helps individuals
+    <em>track their income and expenses</em>, understand their spending patterns through
+    <em>AI-generated insights</em>, connect their bank accounts to receive automatic transactions
+    via SMS parsing, and explore curated <em>investment plans</em> tailored to their financial profile.
+  </p>
+  <p>
+    The application features a <strong>futuristic dark-mode UI</strong> with glassmorphism design,
+    animated components, and a "neural/cyber" aesthetic — making finance feel modern and engaging.
+  </p>
+
+  <div class="callout callout-info">
+    <div class="callout-label">💡 Who is this for?</div>
+    SpendWiser is built for students, working professionals, or anyone who wants a smart,
+    beautiful, and AI-assisted way to understand and control their money — primarily targeting
+    the Indian market (₹ INR currency, Indian investment schemes like PPF, NPS, LIC).
+  </div>
+
+  <h2 id="sec1-2">1.2 Key Features</h2>
+  <table>
+    <thead><tr><th>Feature Category</th><th>Feature</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td rowspan="5"><strong>💰 Transactions</strong></td><td>Manual Entry</td><td>Add income/expense with amount, category, date, description, wallet selection</td></tr>
+      <tr><td>SMS Parsing</td><td>Paste any bank SMS — AI (Gemini) or regex engine auto-extracts amount, type, merchant</td></tr>
+      <tr><td>Receipt Scan</td><td>Upload a receipt image; Gemini AI reads merchant name, amount, date, category</td></tr>
+      <tr><td>Excel Download</td><td>Download all transactions as .xlsx spreadsheet</td></tr>
+      <tr><td>CSV Export</td><td>Export filtered transactions to .csv from the browser</td></tr>
+
+      <tr><td rowspan="3"><strong>🏦 Banking</strong></td><td>Bank Account Storage</td><td>Store up to 10 bank accounts (name, IFSC, account type, mobile). Secured in MongoDB.</td></tr>
+      <tr><td>Account Masking</td><td>Account numbers display only last 4 digits (e.g., ****4321)</td></tr>
+      <tr><td>SMS Webhook</td><td>Receive real bank SMS alerts automatically via a webhook endpoint</td></tr>
+
+      <tr><td rowspan="3"><strong>🤖 AI Features</strong></td><td>Spending Insights</td><td>Google Gemini analyzes your transactions and gives a 3-sentence financial summary</td></tr>
+      <tr><td>AI Suggestions</td><td>Gemini returns 4–6 structured cards: saving tips, investment ideas, warnings</td></tr>
+      <tr><td>Bank Message Parser</td><td>Gemini reads a raw bank SMS and extracts structured transaction data</td></tr>
+
+      <tr><td rowspan="3"><strong>📊 Analytics</strong></td><td>Dashboard Charts</td><td>Bar chart showing spending by category; liquid gauge budget meters</td></tr>
+      <tr><td>Budget Tracking</td><td>Auto-calculates how much you've spent in each budget category</td></tr>
+      <tr><td>Live Investment Rates</td><td>Background scraper fetches real PPF interest rate from ClearTax.in every 2 months</td></tr>
+
+      <tr><td rowspan="2"><strong>⚙️ Settings</strong></td><td>Toggle Preferences</td><td>Push notifications, email alerts, sound effects, auto-sync, 2FA, data retention</td></tr>
+      <tr><td>Data Management</td><td>Export full JSON backup or permanently delete all data</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="sec1-3">1.3 Technology Stack</h2>
+  <div class="spec-grid">
+    <div class="spec-card">
+      <div class="spec-label">Frontend Framework</div>
+      <div class="spec-value">React 19</div>
+      <div class="spec-sub">with TypeScript 5.8, Vite 6.2 build tool</div>
+    </div>
+    <div class="spec-card">
+      <div class="spec-label">Styling</div>
+      <div class="spec-value">Tailwind CSS</div>
+      <div class="spec-sub">Utility-first CSS, dark glassmorphism theme</div>
+    </div>
+    <div class="spec-card">
+      <div class="spec-label">Charts</div>
+      <div class="spec-value">Recharts 3.5</div>
+      <div class="spec-sub">Bar charts, responsive containers, custom tooltips</div>
+    </div>
+    <div class="spec-card">
+      <div class="spec-label">Icons</div>
+      <div class="spec-value">Lucide React 0.554</div>
+      <div class="spec-sub">500+ SVG icons as React components</div>
+    </div>
+    <div class="spec-card">
+      <div class="spec-label">Backend Runtime</div>
+      <div class="spec-value">Node.js + Express 5</div>
+      <div class="spec-sub">REST API, CORS, rate limiting, error handling</div>
+    </div>
+    <div class="spec-card">
+      <div class="spec-label">Database</div>
+      <div class="spec-value">MongoDB + Mongoose 8</div>
+      <div class="spec-sub">ODM for schema definition, queries, upsert operations</div>
+    </div>
+    <div class="spec-card">
+      <div class="spec-label">Authentication</div>
+      <div class="spec-value">JWT (jsonwebtoken)</div>
+      <div class="spec-sub">Bearer token auth, 7-day expiry, bcryptjs password hashing</div>
+    </div>
+    <div class="spec-card">
+      <div class="spec-label">AI Engine</div>
+      <div class="spec-value">Google Gemini API</div>
+      <div class="spec-sub">gemini-2.5-flash and gemini-2.0-flash models</div>
+    </div>
+    <div class="spec-card">
+      <div class="spec-label">Web Scraping</div>
+      <div class="spec-value">Axios + Cheerio</div>
+      <div class="spec-sub">Fetches live PPF rates from ClearTax.in every 2 months</div>
+    </div>
+    <div class="spec-card">
+      <div class="spec-label">Email</div>
+      <div class="spec-value">Nodemailer (SMTP)</div>
+      <div class="spec-sub">Sends welcome email on new user registration</div>
+    </div>
+    <div class="spec-card">
+      <div class="spec-label">Validation</div>
+      <div class="spec-value">Joi 17</div>
+      <div class="spec-sub">Schema-based request body validation</div>
+    </div>
+    <div class="spec-card">
+      <div class="spec-label">Scheduling</div>
+      <div class="spec-value">node-cron 4</div>
+      <div class="spec-sub">Cron job: scrape investment rates every 2 months</div>
+    </div>
+    <div class="spec-card">
+      <div class="spec-label">Excel</div>
+      <div class="spec-value">xlsx (SheetJS)</div>
+      <div class="spec-sub">Read/write .xlsx as offline backup storage</div>
+    </div>
+    <div class="spec-card">
+      <div class="spec-label">Deployment</div>
+      <div class="spec-value">Vercel</div>
+      <div class="spec-sub">Frontend static + serverless backend via vercel.json</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!--  SECTION 2 – SYSTEM ARCHITECTURE                          -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="doc-page" id="sec2">
+  <div class="section-banner">
+    <div class="banner-tag">Section 2</div>
+    <h1>System Architecture</h1>
+    <p>How all the pieces fit together — from browser to database.</p>
+  </div>
+
+  <h2 id="sec2-1">2.1 High-Level Architecture</h2>
+  <p>SpendWiser follows a <strong>client-server architecture</strong> with three main layers:</p>
+  <ol>
+    <li><strong>Client (Browser)</strong> — React 19 SPA running in the user's browser. Handles all UI rendering, local state, and makes API calls to the backend.</li>
+    <li><strong>Backend (Express Server)</strong> — Node.js/Express REST API running on port 5000. Handles business logic, authentication, data persistence, and AI calls.</li>
+    <li><strong>Database (MongoDB)</strong> — Stores Users, Transactions, BankDetails, and investment Rates documents.</li>
+  </ol>
+
+  <div class="flow">
+    <div class="flow-step">🌐 Browser (React)</div>
+    <div class="flow-arrow">⟷</div>
+    <div class="flow-step">🔗 HTTP/API Calls</div>
+    <div class="flow-arrow">⟷</div>
+    <div class="flow-step">⚙️ Express Server</div>
+    <div class="flow-arrow">⟷</div>
+    <div class="flow-step">🗄️ MongoDB</div>
+  </div>
+
+  <div class="flow" style="background:#fff3e0;">
+    <div class="flow-step" style="background:#f59e0b;">🤖 Gemini API</div>
+    <div class="flow-arrow">⟵</div>
+    <div class="flow-step" style="background:#6366f1;">React Service</div>
+    <div class="flow-arrow">⟷</div>
+    <div class="flow-step" style="background:#1e293b;">Browser calls Gemini directly</div>
+  </div>
+
+  <div class="callout callout-info">
+    <div class="callout-label">📌 Important Note on AI Calls</div>
+    All AI calls (Gemini API) are made <strong>directly from the browser</strong> using the
+    <code>VITE_GEMINI_API_KEY</code> environment variable. This means the AI features
+    work completely client-side without passing data through the backend.
+  </div>
+
+  <div class="flow" style="background:#f0fdf4;">
+    <div class="flow-step" style="background:#059669;">📈 ClearTax.in</div>
+    <div class="flow-arrow">⟵ scrape</div>
+    <div class="flow-step" style="background:#1e293b;">Scraper Service</div>
+    <div class="flow-arrow">→ cache</div>
+    <div class="flow-step" style="background:#059669;">MongoDB / rates.json</div>
+    <div class="flow-arrow">→ serve</div>
+    <div class="flow-step" style="background:#6366f1;">React App</div>
+  </div>
+
+  <h2 id="sec2-2">2.2 Project Folder Structure</h2>
+  <div class="file-tree">
+    <span class="dir">spendwiser/</span><br/>
+    ├── <span class="dir">backend/</span> <span class="note">  ← Node.js + Express API server</span><br/>
+    │   ├── <span class="file">server.js</span> <span class="note">         ← Main entry point (Express app)</span><br/>
+    │   ├── <span class="dir">controllers/</span> <span class="note">      ← Business logic per feature</span><br/>
+    │   │   ├── <span class="file">authController.js</span> <span class="note">   ← register, login, getUser, updateUser</span><br/>
+    │   │   ├── <span class="file">transactionController.js</span> <span class="note">← CRUD + download + clear</span><br/>
+    │   │   ├── <span class="file">bankController.js</span> <span class="note">   ← save/get/delete bank details</span><br/>
+    │   │   └── <span class="file">smsController.js</span> <span class="note">    ← receive SMS webhook</span><br/>
+    │   ├── <span class="dir">models/</span> <span class="note">           ← Mongoose schemas (MongoDB collections)</span><br/>
+    │   │   ├── <span class="file">User.js</span><br/>
+    │   │   ├── <span class="file">Transaction.js</span><br/>
+    │   │   ├── <span class="file">BankDetails.js</span><br/>
+    │   │   └── <span class="file">Rates.js</span><br/>
+    │   ├── <span class="dir">routes/</span> <span class="note">           ← Express Router definitions</span><br/>
+    │   │   ├── <span class="file">authRoutes.js</span><br/>
+    │   │   ├── <span class="file">transactionRoutes.js</span><br/>
+    │   │   ├── <span class="file">bankRoutes.js</span><br/>
+    │   │   └── <span class="file">smsRoutes.js</span><br/>
+    │   ├── <span class="dir">middleware/</span> <span class="note">       ← Request processing layers</span><br/>
+    │   │   ├── <span class="file">auth.js</span> <span class="note">         ← JWT token verification</span><br/>
+    │   │   ├── <span class="file">rateLimiter.js</span> <span class="note">  ← Rate limiting (4 levels)</span><br/>
+    │   │   └── <span class="file">validate.js</span> <span class="note">     ← Joi request validation</span><br/>
+    │   ├── <span class="dir">services/</span> <span class="note">         ← External service integrations</span><br/>
+    │   │   ├── <span class="file">emailService.js</span> <span class="note">  ← Nodemailer SMTP welcome email</span><br/>
+    │   │   ├── <span class="file">scraperService.js</span> <span class="note">← Web scraping + caching investment rates</span><br/>
+    │   │   └── <span class="file">excelService.js</span> <span class="note">  ← SheetJS read/write .xlsx backup</span><br/>
+    │   ├── <span class="dir">utils/</span> <span class="note">            ← Reusable helper functions</span><br/>
+    │   │   ├── <span class="file">db.js</span> <span class="note">           ← MongoDB connection manager</span><br/>
+    │   │   ├── <span class="file">smsParser.js</span> <span class="note">    ← Regex-based bank SMS parser</span><br/>
+    │   │   ├── <span class="file">excelHelper.js</span><br/>
+    │   │   └── <span class="file">paths.js</span><br/>
+    │   ├── <span class="dir">validators/</span><br/>
+    │   │   └── <span class="file">schemas.js</span> <span class="note">      ← Joi validation schemas</span><br/>
+    │   ├── <span class="file">.env</span> <span class="note">              ← Secret environment variables</span><br/>
+    │   ├── <span class="file">data.xlsx</span> <span class="note">          ← Fallback Excel backup file</span><br/>
+    │   └── <span class="file">rates.json</span> <span class="note">         ← Cached investment rates</span><br/>
+    │<br/>
+    ├── <span class="dir">client/</span> <span class="note">  ← React 19 + TypeScript SPA</span><br/>
+    │   ├── <span class="file">index.html</span> <span class="note">         ← HTML shell</span><br/>
+    │   ├── <span class="file">index.tsx</span> <span class="note">          ← React DOM root render</span><br/>
+    │   ├── <span class="file">App.tsx</span> <span class="note">            ← Root component (state management + routing)</span><br/>
+    │   ├── <span class="file">types.ts</span> <span class="note">           ← TypeScript interface definitions</span><br/>
+    │   ├── <span class="file">index.css</span> <span class="note">          ← Global Tailwind + custom styles</span><br/>
+    │   ├── <span class="dir">components/</span> <span class="note">       ← All page-level React components</span><br/>
+    │   │   ├── <span class="file">LoginPage.tsx</span><br/>
+    │   │   ├── <span class="file">Sidebar.tsx</span><br/>
+    │   │   ├── <span class="file">Dashboard.tsx</span><br/>
+    │   │   ├── <span class="file">VaultsView.tsx</span><br/>
+    │   │   ├── <span class="file">LedgerView.tsx</span><br/>
+    │   │   ├── <span class="file">InsightsView.tsx</span><br/>
+    │   │   ├── <span class="file">AISuggestionsView.tsx</span><br/>
+    │   │   ├── <span class="file">InvestmentPlansView.tsx</span><br/>
+    │   │   ├── <span class="file">UserProfileView.tsx</span><br/>
+    │   │   ├── <span class="file">SettingsView.tsx</span><br/>
+    │   │   ├── <span class="file">TransactionModal.tsx</span><br/>
+    │   │   ├── <span class="file">MessageParserModal.tsx</span><br/>
+    │   │   ├── <span class="file">SMSIntegrationModal.tsx</span><br/>
+    │   │   └── <span class="file">LiquidGauge.tsx</span><br/>
+    │   └── <span class="dir">services/</span><br/>
+    │       ├── <span class="file">authService.ts</span> <span class="note">   ← Login/register/logout API wrappers</span><br/>
+    │       └── <span class="file">geminiService.ts</span> <span class="note"> ← All Google Gemini AI calls</span><br/>
+    │<br/>
+    ├── <span class="dir">api/</span> <span class="note">  ← Vercel serverless entry</span><br/>
+    │   └── <span class="file">index.js</span> <span class="note">  ← Re-exports backend app for Vercel Functions</span><br/>
+    │<br/>
+    ├── <span class="file">vercel.json</span> <span class="note">  ← Vercel routing config</span><br/>
+    ├── <span class="file">package.json</span> <span class="note"> ← Root scripts (dev, build)</span><br/>
+    └── <span class="file">README.md</span>
+  </div>
+
+  <h2 id="sec2-3">2.3 Data Flow — Step by Step</h2>
+  <h3>When User Adds a Transaction</h3>
+  <ol>
+    <li>User clicks <strong>"Initialize Log"</strong> button in the header → <code>TransactionModal</code> opens</li>
+    <li>User fills in: Amount, Type (Income/Expense), Category, Description, Wallet, Date → clicks "Authorize Protocol"</li>
+    <li>React <code>addTransaction()</code> is called in <code>App.tsx</code></li>
+    <li>UI is <strong>optimistically updated</strong> immediately (no waiting for server)</li>
+    <li>An HTTP <code>POST /api/transactions</code> request is sent with JWT Bearer token</li>
+    <li>Express backend receives the request → JWT middleware verifies token → Joi validates body</li>
+    <li>If MongoDB is connected → saves to <code>Transaction</code> collection; else falls back to Excel file</li>
+    <li>Wallet balance is updated locally in React state</li>
+    <li>Budget spending is auto-recalculated from the new transactions array</li>
+  </ol>
+
+  <h3>When User Clicks "Get AI Suggestions"</h3>
+  <ol>
+    <li>User navigates to "AI Advisor" tab → clicks "Get AI Suggestions"</li>
+    <li>React calls <code>getAISuggestions(transactions)</code> in <code>geminiService.ts</code></li>
+    <li>The service calculates: total income, total expenses, savings rate %, category breakdown</li>
+    <li>This data is sent as a prompt to <strong>Google Gemini 2.5 Flash</strong> with a JSON response schema</li>
+    <li>Gemini returns: a summary + 4–6 suggestion cards (saving/investment/warning types)</li>
+    <li>React renders these as styled suggestion cards with priority badges and impact estimates</li>
+  </ol>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!--  SECTION 3 – BACKEND                                      -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="doc-page" id="sec3">
+  <div class="section-banner">
+    <div class="banner-tag">Section 3</div>
+    <h1>Backend – Express API</h1>
+    <p>Every file, every function, every configuration explained.</p>
+  </div>
+
+  <h2 id="sec3-1">3.1 Entry Point — server.js</h2>
+  <p>
+    The file <code>backend/server.js</code> is the <strong>heart of the backend</strong>. It starts
+    the Express application, connects everything together, and begins listening for requests.
+  </p>
+  <p><strong>What it does, line by line:</strong></p>
+  <ol>
+    <li><code>require('dotenv').config()</code> — loads all variables from <code>.env</code> file so they are available as <code>process.env.X</code></li>
+    <li>Imports Express, CORS, Mongoose, node-cron, path</li>
+    <li>Imports middleware: <code>apiLimiter</code> (rate limiter)</li>
+    <li>Imports services: <code>scraperService</code> (investment rates), <code>excelService</code> (Excel file path)</li>
+    <li>Imports routes for: transactions, auth, bank-details, SMS</li>
+    <li>Creates the Express app with <code>app.use(express.json())</code> — allows reading JSON request bodies</li>
+    <li>Configures <strong>CORS</strong>: only allows requests from <code>FRONTEND_URL</code> (default: localhost:3001), supports credentials, allows specific HTTP methods and headers</li>
+    <li>Applies rate limiter to all <code>/api/</code> routes — max 100 requests per 15 minutes</li>
+    <li>Calls <code>loadCachedRates()</code> immediately — fills investment rate cache from file/defaults</li>
+    <li>Schedules a cron job: <code>0 0 1 */2 *</code> = midnight on the 1st of every 2nd month → runs <code>performScraping()</code></li>
+    <li>Runs <code>performScraping()</code> once immediately on server start</li>
+    <li>Registers a fast endpoint: <code>GET /api/investment-rates/scrape</code> → returns cached rates (no DB needed)</li>
+    <li>Connects to MongoDB asynchronously at startup; once connected, loads rates from DB</li>
+    <li>Adds a DB connection middleware for all <code>/api</code> routes — ensures DB is connected before handling requests (with graceful fallback)</li>
+    <li>Registers all route handlers at their URL prefixes</li>
+    <li>Registers a <strong>global error handler</strong> as the last middleware — catches any unhandled errors and returns 500</li>
+    <li>Starts listening on port 5000 (or <code>process.env.PORT</code>) <em>only if not in production</em> — on Vercel, the serverless function handles this</li>
+    <li><code>module.exports = app</code> — exports the app for use in Vercel's serverless entry</li>
+  </ol>
+
+  <pre><code>// Key startup sequence
+loadCachedRates();           // 1. Fill rate cache from file
+cron.schedule('0 0 1 */2 *', performScraping);  // 2. Schedule refresh
+performScraping();           // 3. Run immediately
+connectDB().then(loadRatesFromDB);  // 4. Connect to Mongo + load DB rates</code></pre>
+
+  <h2 id="sec3-2">3.2 Database Connection — utils/db.js</h2>
+  <p>
+    This utility manages a <strong>singleton MongoDB connection</strong> using Mongoose.
+    It prevents opening multiple connections if the server is already connected.
+  </p>
+  <ul>
+    <li><code>connectDB()</code> — checks <code>mongoose.connection.readyState</code>:
+      <ul>
+        <li><code>1</code> = already connected → returns existing connection immediately</li>
+        <li><code>2</code> = connecting → awaits the existing promise (no duplicate connections)</li>
+        <li>Otherwise → creates a new connection with <code>mongoose.connect()</code></li>
+      </ul>
+    </li>
+    <li>For <strong>localhost/127.0.0.1</strong> URIs, forces IPv4 (<code>family: 4</code>) to avoid DNS resolution issues on Windows</li>
+    <li>Stores the last connection error with <code>lastError</code> so controllers can report it to the client</li>
+    <li><code>getLastError()</code> — exported function that controllers use to give useful error messages</li>
+  </ul>
+
+  <div class="callout callout-warning">
+    <div class="callout-label">⚠️ Fallback Mode</div>
+    If MongoDB is unreachable, the app does NOT crash. Instead, controllers detect
+    <code>readyState !== 1</code> and fall back to reading/writing the <code>data.xlsx</code>
+    Excel file. This means the app works even without a database!
+  </div>
+
+  <h2 id="sec3-3">3.3 Database Models</h2>
+  <p>Mongoose models define the structure of documents stored in MongoDB collections.</p>
+
+  <h3>User Model (<code>models/User.js</code>)</h3>
+  <table>
+    <thead><tr><th>Field</th><th>Type</th><th>Rules</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>String</td><td>unique, required</td><td>UUID-based custom ID (not MongoDB's default _id)</td></tr>
+      <tr><td><code>email</code></td><td>String</td><td>unique, required, lowercase</td><td>User login identifier</td></tr>
+      <tr><td><code>password</code></td><td>String</td><td>required</td><td>Bcrypt-hashed password (never stored plain)</td></tr>
+      <tr><td><code>name</code></td><td>String</td><td>optional</td><td>Display name</td></tr>
+      <tr><td><code>createdAt</code></td><td>Date</td><td>default: now</td><td>Account creation timestamp</td></tr>
+      <tr><td><code>updatedAt</code></td><td>Date</td><td>default: now</td><td>Last modification timestamp</td></tr>
+    </tbody>
+  </table>
+  <p><strong>Special behaviors:</strong></p>
+  <ul>
+    <li><strong>Pre-save hook</strong>: Before saving, if password was changed, it runs <code>bcrypt.genSalt(10)</code> + <code>bcrypt.hash()</code> automatically — so you never need to manually hash passwords</li>
+    <li><code>comparePassword(candidatePassword)</code> method — compares a plain text password with the stored hash using <code>bcrypt.compare()</code></li>
+  </ul>
+
+  <h3>Transaction Model (<code>models/Transaction.js</code>)</h3>
+  <table>
+    <thead><tr><th>Field</th><th>Type</th><th>Default</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>String</td><td>uuidv4()</td><td>UUID auto-generated on creation</td></tr>
+      <tr><td><code>amount</code></td><td>Number</td><td>—</td><td>Transaction amount in specified currency</td></tr>
+      <tr><td><code>type</code></td><td>String</td><td>—</td><td>'income' or 'expense'</td></tr>
+      <tr><td><code>category</code></td><td>String</td><td>—</td><td>Food, Transport, Housing, Entertainment, Shopping, Health, etc.</td></tr>
+      <tr><td><code>description</code></td><td>String</td><td>—</td><td>Human-readable label (merchant name, note)</td></tr>
+      <tr><td><code>date</code></td><td>String</td><td>—</td><td>ISO date string (YYYY-MM-DD)</td></tr>
+      <tr><td><code>walletId</code></td><td>String</td><td>—</td><td>Links transaction to a wallet (1=checking, 2=cash, 3=savings)</td></tr>
+      <tr><td><code>currency</code></td><td>String</td><td>'INR'</td><td>Currency code</td></tr>
+      <tr><td><code>source</code></td><td>String</td><td>'manual'</td><td>'manual', 'sms', 'api', 'bank_sync'</td></tr>
+      <tr><td><code>smsFrom</code></td><td>String</td><td>—</td><td>Sender phone number (for SMS-sourced transactions)</td></tr>
+      <tr><td><code>createdAt</code></td><td>Date</td><td>now</td><td>Creation timestamp</td></tr>
+      <tr><td><code>updatedAt</code></td><td>Date</td><td>now</td><td>Last update timestamp</td></tr>
+    </tbody>
+  </table>
+
+  <h3>BankDetails Model (<code>models/BankDetails.js</code>)</h3>
+  <table>
+    <thead><tr><th>Field</th><th>Type</th><th>Rules</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>userId</code></td><td>String</td><td>required, unique</td><td>Links bank accounts to a specific user (one doc per user)</td></tr>
+      <tr><td><code>accounts</code></td><td>Array</td><td>default: []</td><td>List of bank account objects (up to 10 allowed by UI)</td></tr>
+      <tr><td><code>createdAt</code></td><td>Date</td><td>now</td><td>First save timestamp</td></tr>
+      <tr><td><code>updatedAt</code></td><td>Date</td><td>now</td><td>Last update timestamp</td></tr>
+    </tbody>
+  </table>
+  <p>Each account in <code>accounts[]</code> contains: <code>bankName</code>, <code>accountNumber</code>, <code>ifscCode</code>, <code>accountType</code>, <code>mobileNumber</code>, <code>email</code>, <code>accountHolder</code>.</p>
+
+  <h3>Rates Model (<code>models/Rates.js</code>)</h3>
+  <p>Stores scraped investment interest rates as a key-value Map in MongoDB. Used to persist the scraped PPF/FD/NPS rates across server restarts.</p>
+
+  <h2 id="sec3-4">3.4 API Routes</h2>
+  <p>Routes connect HTTP endpoint paths to the correct controller functions, while applying appropriate middleware.</p>
+
+  <h3>Auth Routes (<code>routes/authRoutes.js</code>)</h3>
+  <table>
+    <thead><tr><th>HTTP Method</th><th>Path</th><th>Middleware Chain</th><th>Controller</th></tr></thead>
+    <tbody>
+      <tr><td>POST</td><td>/api/auth/register</td><td>registerLimiter → validateRequest(userSchema)</td><td>authController.register</td></tr>
+      <tr><td>POST</td><td>/api/auth/login</td><td>loginLimiter → validateRequest(userSchema)</td><td>authController.login</td></tr>
+      <tr><td>GET</td><td>/api/auth/user/:userId</td><td>authMiddleware (JWT check)</td><td>authController.getUser</td></tr>
+      <tr><td>PUT</td><td>/api/auth/user/:userId</td><td>authMiddleware (JWT check)</td><td>authController.updateUser</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Transaction Routes (<code>routes/transactionRoutes.js</code>)</h3>
+  <table>
+    <thead><tr><th>HTTP Method</th><th>Path</th><th>Auth Required</th><th>Controller</th></tr></thead>
+    <tbody>
+      <tr><td>GET</td><td>/api/transactions/</td><td>✅ JWT</td><td>getTransactions (sorted by date desc)</td></tr>
+      <tr><td>POST</td><td>/api/transactions/</td><td>✅ JWT + Joi validate</td><td>createTransaction</td></tr>
+      <tr><td>PUT</td><td>/api/transactions/:id</td><td>✅ JWT</td><td>updateTransaction</td></tr>
+      <tr><td>DELETE</td><td>/api/transactions/:id</td><td>✅ JWT</td><td>deleteTransaction</td></tr>
+      <tr><td>GET</td><td>/api/transactions/download</td><td>❌ None</td><td>downloadTransactions (returns .xlsx file)</td></tr>
+      <tr><td>DELETE</td><td>/api/transactions/data/clear</td><td>❌ None</td><td>clearAllTransactions (admin function)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Bank Routes (<code>routes/bankRoutes.js</code>)</h3>
+  <table>
+    <thead><tr><th>HTTP Method</th><th>Path</th><th>Auth Required</th><th>Controller</th></tr></thead>
+    <tbody>
+      <tr><td>GET</td><td>/api/bank-details/:userId</td><td>✅ JWT</td><td>getBankDetails</td></tr>
+      <tr><td>POST</td><td>/api/bank-details/</td><td>✅ JWT + Joi validate</td><td>updateBankDetails (upsert)</td></tr>
+      <tr><td>DELETE</td><td>/api/bank-details/:userId</td><td>✅ JWT</td><td>deleteBankDetails</td></tr>
+    </tbody>
+  </table>
+
+  <h3>SMS Routes (<code>routes/smsRoutes.js</code>)</h3>
+  <table>
+    <thead><tr><th>HTTP Method</th><th>Path</th><th>Auth Required</th><th>Controller</th></tr></thead>
+    <tbody>
+      <tr><td>POST</td><td>/api/sms/webhook</td><td>❌ None (webhook)</td><td>smsController.receiveWebhook</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="sec3-5">3.5 Controllers</h2>
+
+  <h3>Auth Controller (<code>controllers/authController.js</code>)</h3>
+  <p>Handles all user account operations:</p>
+  <ul>
+    <li><strong>register(req, res)</strong> — Creates a new user. Checks for duplicate email, creates User document (password auto-hashed via pre-save hook), sends welcome email asynchronously, returns user data (without password)</li>
+    <li><strong>login(req, res)</strong> — Finds user by email (lowercase), calls <code>user.comparePassword()</code> to verify, generates a JWT token with <code>userId</code> and <code>email</code> payload, 7-day expiry, returns <code>{ token, user }</code></li>
+    <li><strong>getUser(req, res)</strong> — Fetches user by userId param (JWT protected)</li>
+    <li><strong>updateUser(req, res)</strong> — Updates name and/or password (JWT protected). Uses <code>findOneAndUpdate</code> with <code>{ new: true }</code> to return updated document</li>
+  </ul>
+
+  <div class="callout callout-warning">
+    <div class="callout-label">⚠️ All controllers check MongoDB state</div>
+    Every controller function starts with: <code>if (mongoose.connection.readyState === 1 || readyState === 2)</code>.
+    If not connected, it returns a 503 error with the last connection error message.
+    Transaction controller additionally falls back to Excel file operations.
+  </div>
+
+  <h3>Transaction Controller (<code>controllers/transactionController.js</code>)</h3>
+  <ul>
+    <li><strong>getTransactions</strong> — Finds all transactions, sorted by date descending. Falls back to reading Excel file if no DB</li>
+    <li><strong>createTransaction</strong> — Generates UUID, sets defaults (currency='INR'), saves to MongoDB or Excel fallback</li>
+    <li><strong>updateTransaction</strong> — Uses <code>findOneAndUpdate({ id })</code> with body spread + updated timestamp</li>
+    <li><strong>deleteTransaction</strong> — Uses <code>findOneAndDelete({ id })</code></li>
+    <li><strong>clearAllTransactions</strong> — <code>Transaction.deleteMany({})</code> or recreates empty Excel sheet</li>
+    <li><strong>downloadTransactions</strong> — Calls <code>res.download(EXCEL_FILE, 'spendwiser-transactions.xlsx')</code></li>
+  </ul>
+
+  <h3>Bank Controller (<code>controllers/bankController.js</code>)</h3>
+  <ul>
+    <li><strong>getBankDetails(userId)</strong> — <code>BankDetails.findOne({ userId })</code></li>
+    <li><strong>updateBankDetails</strong> — Uses <code>findOneAndUpdate({ userId }, data, { upsert: true, new: true })</code> — creates OR updates in one query. On first bank save (no existing <code>bank_sync</code> transactions), inserts 4 sample transactions to populate the dashboard with demo data</li>
+    <li><strong>deleteBankDetails(userId)</strong> — <code>findOneAndDelete({ userId })</code></li>
+  </ul>
+
+  <h3>SMS Controller (<code>controllers/smsController.js</code>)</h3>
+  <ul>
+    <li><strong>receiveWebhook</strong> — Accepts <code>{ message, from, timestamp }</code> in POST body. Calls <code>parseBankSMS(message)</code> from <code>smsParser.js</code> to extract transaction data. Creates a Transaction document with <code>source: 'sms'</code> and <code>smsFrom: from</code>. Saves to MongoDB or Excel fallback.</li>
+  </ul>
+
+  <h2 id="sec3-6">3.6 Middleware</h2>
+
+  <h3>JWT Auth Middleware (<code>middleware/auth.js</code>)</h3>
+  <p>Verifies that the request has a valid JWT token:</p>
+  <ol>
+    <li>Reads the <code>Authorization</code> header</li>
+    <li>Checks it starts with <code>"Bearer "</code></li>
+    <li>Extracts the token (everything after "Bearer ")</li>
+    <li>Calls <code>jwt.verify(token, JWT_SECRET)</code></li>
+    <li>If valid: adds decoded payload to <code>req.user</code> and calls <code>next()</code></li>
+    <li>If invalid/expired: returns 401 with specific error message</li>
+  </ol>
+
+  <h3>Rate Limiter Middleware (<code>middleware/rateLimiter.js</code>)</h3>
+  <p>Four different rate limiters for different security needs:</p>
+  <table>
+    <thead><tr><th>Limiter</th><th>Window</th><th>Max Requests</th><th>Applied To</th></tr></thead>
+    <tbody>
+      <tr><td><code>apiLimiter</code></td><td>15 minutes</td><td>100</td><td>All /api/ routes (global)</td></tr>
+      <tr><td><code>loginLimiter</code></td><td>15 minutes</td><td>5</td><td>/api/auth/login only</td></tr>
+      <tr><td><code>registerLimiter</code></td><td>1 hour</td><td>3</td><td>/api/auth/register only</td></tr>
+      <tr><td><code>smsLimiter</code></td><td>1 hour</td><td>50</td><td>/api/sms/webhook</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Validation Middleware (<code>middleware/validate.js</code>)</h3>
+  <p>A higher-order function: <code>validateRequest(schema)</code> returns an Express middleware that runs <code>schema.validate(req.body)</code>. If validation fails, returns 400 with Joi's error details. If valid, calls <code>next()</code>.</p>
+
+  <h2 id="sec3-7">3.7 Services</h2>
+
+  <h3>Email Service (<code>services/emailService.js</code>)</h3>
+  <ul>
+    <li>Creates a Nodemailer transporter using SMTP credentials from environment variables</li>
+    <li><code>sendWelcomeEmail(userEmail, userName)</code> — sends HTML welcome email after registration</li>
+    <li>Gracefully skips if <code>SMTP_USER</code> or <code>SMTP_PASS</code> are not configured</li>
+    <li>Email template includes the user's name and a welcome message</li>
+  </ul>
+
+  <h3>Scraper Service (<code>services/scraperService.js</code>)</h3>
+  <ul>
+    <li>Maintains an in-memory <code>cachedRates</code> object with default values for PPF (7.1%), FD (6.5%), NPS (9%), LIC (5.5%), Gold (10.5%), Mutual Funds (14%)</li>
+    <li><code>loadCachedRates()</code> — reads <code>rates.json</code> file on disk and merges into cache</li>
+    <li><code>loadRatesFromDB()</code> — queries the Rates MongoDB document and merges into cache</li>
+    <li><code>performScraping()</code> — uses Axios to fetch ClearTax.in/ppf page, Cheerio to parse HTML, extracts PPF rate with regex. Saves updated rates to file and MongoDB</li>
+    <li><code>getCachedRates()</code> — returns current cached rates for the API endpoint</li>
+  </ul>
+
+  <h3>Excel Service (<code>services/excelService.js</code>)</h3>
+  <ul>
+    <li>Uses SheetJS (xlsx library) to manage the <code>data.xlsx</code> file</li>
+    <li><code>initExcel()</code> — creates the file with headers if it doesn't exist</li>
+    <li><code>readTransactionsFromExcel()</code> — reads all rows and converts to Transaction objects</li>
+    <li><code>writeTransactionsToExcel(transactions)</code> — overwrites the sheet with the given array</li>
+    <li>Acts as a <strong>complete fallback database</strong> when MongoDB is unavailable</li>
+  </ul>
+
+  <h2 id="sec3-8">3.8 Utilities</h2>
+
+  <h3>SMS Parser (<code>utils/smsParser.js</code>)</h3>
+  <p>A pure function that parses raw bank SMS text using regular expressions — no AI needed:</p>
+  <ul>
+    <li>Defines 4 regex patterns to match: "Paid Rs. X", "Debit/Credit of Rs. X from/to BANK", "Amount Rs. X debited/credited", "Rs. X debit/credit"</li>
+    <li>Extracts <strong>amount</strong> as a float (removes commas from numbers)</li>
+    <li>Determines <strong>type</strong> by checking for keywords: "paid", "debited", "debit", "sent" → expense; "received", "credited", "credit" → income</li>
+    <li>Extracts <strong>merchant/description</strong> from "at/from/to [Name]" pattern</li>
+    <li>Detects payment method: GPay, PhonePe, Paytm — appends to description</li>
+    <li>Categorizes based on keywords: food/restaurant/cafe, fuel/petrol/auto, rent/housing, movie/entertainment, shopping/mall, hospital/medical/pharmacy, salary/credited</li>
+    <li>Returns <code>null</code> if no amount pattern matches</li>
+  </ul>
+
+  <h2 id="sec3-9">3.9 Validators (schemas.js)</h2>
+  <p>Four Joi schemas that validate request bodies before they reach controllers:</p>
+  <ul>
+    <li><strong>userSchema</strong>: email (valid email, required), password (min 6 chars, required), name (required)</li>
+    <li><strong>transactionSchema</strong>: amount (positive number, required), type ('income'|'expense', required), category (required), description (max 500 chars, optional), date (required), walletId (required), currency (default 'INR')</li>
+    <li><strong>bankDetailsSchema</strong>: userId (required), accounts array with objects containing bankName, accountNumber, ifscCode, accountType (all required)</li>
+    <li><strong>smsSchema</strong>: message (required), from (optional), timestamp (optional)</li>
+  </ul>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!--  SECTION 4 – FRONTEND                                     -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="doc-page" id="sec4">
+  <div class="section-banner">
+    <div class="banner-tag">Section 4</div>
+    <h1>Frontend – React Application</h1>
+    <p>The React SPA structure, state management, and service layer.</p>
+  </div>
+
+  <h2 id="sec4-1">4.1 Main App Component (App.tsx)</h2>
+  <p>
+    <code>App.tsx</code> is the root component that acts as the <strong>application controller</strong>.
+    It holds the global state and renders the appropriate page based on the active tab.
+  </p>
+
+  <h3>State Variables Explained</h3>
+  <table>
+    <thead><tr><th>State Variable</th><th>Type</th><th>What It Stores</th></tr></thead>
+    <tbody>
+      <tr><td><code>user</code></td><td>User | null</td><td>Currently logged-in user data (id, email, name). null = not logged in</td></tr>
+      <tr><td><code>activeTab</code></td><td>string</td><td>Currently visible page: 'dashboard', 'wallets', 'transactions', 'insights', 'suggestions', 'investments', 'profile', 'settings'</td></tr>
+      <tr><td><code>transactions</code></td><td>Transaction[]</td><td>All transactions loaded from the backend or localStorage fallback</td></tr>
+      <tr><td><code>wallets</code></td><td>Wallet[]</td><td>3 wallets: Main Checking, Cash, Savings. Loaded from localStorage or defaults</td></tr>
+      <tr><td><code>budgets</code></td><td>Budget[]</td><td>3 budget categories: Food (₹5000), Transport (₹3000), Entertainment (₹2000). Auto-updated based on transactions</td></tr>
+      <tr><td><code>isModalOpen</code></td><td>boolean</td><td>Controls TransactionModal visibility</td></tr>
+      <tr><td><code>isParserModalOpen</code></td><td>boolean</td><td>Controls MessageParserModal (SMS input) visibility</td></tr>
+      <tr><td><code>isSMSIntegrationOpen</code></td><td>boolean</td><td>Controls SMSIntegrationModal visibility</td></tr>
+      <tr><td><code>searchQuery</code></td><td>string</td><td>Live search filter text used in Dashboard and Ledger</td></tr>
+      <tr><td><code>aiInsights</code></td><td>string</td><td>Text response from Gemini for Insights page</td></tr>
+      <tr><td><code>aiSuggestions</code></td><td>AISuggestionsResult | null</td><td>Structured AI suggestions: summary + suggestion cards</td></tr>
+    </tbody>
+  </table>
+
+  <h3>useEffect Hooks Explained</h3>
+  <ol>
+    <li><strong>Auth Check</strong> (runs once on mount) — Calls <code>AuthService.getCurrentUser()</code> to read session from localStorage. If found, sets the user state (auto-login on refresh)</li>
+    <li><strong>Data Loading</strong> (runs once on mount) — Reads wallets and budgets from localStorage. Fetches transactions from <code>GET /api/transactions</code> with JWT. Falls back to localStorage if backend fails. Listens for <code>refreshTransactions</code> custom events (fired after bank details save)</li>
+    <li><strong>Wallet Persistence</strong> — Saves wallets to localStorage whenever they change</li>
+    <li><strong>Transaction Persistence + Budget Sync</strong> — Saves transactions to localStorage; recalculates each budget's <code>spent</code> amount by summing matching expense transactions</li>
+    <li><strong>Budget Persistence</strong> — Saves updated budgets to localStorage</li>
+  </ol>
+
+  <h3>Key Functions</h3>
+  <ul>
+    <li><code>addTransaction(txData)</code> — optimistically adds to state, POSTs to backend, updates wallet balance</li>
+    <li><code>deleteTransaction(id)</code> — removes from state, DELETEs from backend</li>
+    <li><code>handleGenerateInsights()</code> — calls <code>getSpendingInsights(transactions)</code>, stores result</li>
+    <li><code>handleGenerateSuggestions()</code> — calls <code>getAISuggestions(transactions)</code>, stores structured result</li>
+    <li><code>handleLogin(user)</code> / <code>handleLogout()</code> — manages auth state and localStorage cleanup</li>
+  </ul>
+
+  <div class="callout callout-info">
+    <div class="callout-label">🔑 Authentication Gate</div>
+    The very first render check: <code>if (!user) return &lt;LoginPage onLogin={handleLogin} /&gt;</code>.
+    If no user is in state, the entire app is replaced with the login page.
+    This is a simple but effective client-side route guard.
+  </div>
+
+  <h2 id="sec4-2">4.2 TypeScript Types (types.ts)</h2>
+  <p>Defines all shared data structures used across the React application:</p>
+
+  <pre><code>// Transaction type literal
+type TransactionType = 'income' | 'expense';
+
+// Expense/income category enum
+enum Category {
+  FOOD = 'Food', TRANSPORT = 'Transport',
+  HOUSING = 'Housing', ENTERTAINMENT = 'Entertainment',
+  SHOPPING = 'Shopping', HEALTH = 'Health',
+  SALARY = 'Salary', INVESTMENT = 'Investment', OTHER = 'Other'
+}
+
+// Wallet (a money container)
+interface Wallet {
+  id: string;          // '1', '2', '3'
+  name: string;        // 'Main Checking', 'Cash', 'Savings'
+  type: 'cash' | 'card' | 'savings';
+  balance: number;     // Calculated from transactions
+  currency: string;   // 'INR'
+  color: string;       // Hex color for UI
+}
+
+// A single money movement record
+interface Transaction {
+  id: string;
+  amount: number;
+  type: TransactionType;
+  category: Category | string;
+  date: string;            // ISO string
+  description: string;
+  walletId: string;
+  receiptUrl?: string;     // Base64 image of receipt
+  receiptMerchant?: string;
+  currency: string;
+}
+
+// AI receipt analysis result
+interface ReceiptAnalysisResult {
+  merchant: string; date: string; amount: number;
+  category: string; description: string; currency?: string;
+}
+
+// Logged-in user
+interface User { id: string; email: string; name: string; }
+
+// Budget limit vs actual spending
+interface Budget {
+  id: string; category: Category | string;
+  limit: number; spent: number; currency: string;
+}</code></pre>
+
+  <h2 id="sec4-3">4.3 Client Services</h2>
+
+  <h3>Auth Service (<code>services/authService.ts</code>)</h3>
+  <p>A singleton object <code>AuthService</code> with these methods:</p>
+  <ul>
+    <li><code>login(email, password)</code> — POSTs to <code>/api/auth/login</code>. On success: saves JWT token to <code>localStorage['smartspend_token']</code> and user to <code>localStorage['smartspend_session_v1']</code>. Returns the User object</li>
+    <li><code>register(email, password, name)</code> — POSTs to <code>/api/auth/register</code>. Saves session to localStorage. Returns User</li>
+    <li><code>logout()</code> — Removes session and token from localStorage</li>
+    <li><code>getCurrentUser()</code> — Reads and parses <code>localStorage['smartspend_session_v1']</code></li>
+    <li><code>getToken()</code> — Returns the stored JWT token string</li>
+    <li><code>updateProfile(userId, name?, password?)</code> — PUTs to <code>/api/auth/user/:userId</code> with JWT auth header. Updates localStorage session with new user data</li>
+  </ul>
+
+  <h3>Gemini Service (<code>services/geminiService.ts</code>)</h3>
+  <p>All AI calls go through this service. It initializes the <code>GoogleGenAI</code> client with <code>VITE_GEMINI_API_KEY</code>.</p>
+
+  <table>
+    <thead><tr><th>Function</th><th>AI Model</th><th>Input</th><th>Output</th></tr></thead>
+    <tbody>
+      <tr><td><code>analyzeReceiptImage(base64)</code></td><td>gemini-2.5-flash</td><td>Base64 image</td><td>ReceiptAnalysisResult (merchant, amount, date, category, description)</td></tr>
+      <tr><td><code>getSpendingInsights(transactions)</code></td><td>gemini-2.5-flash</td><td>Last 50 transactions (simplified)</td><td>Plain text string (max 3 sentences)</td></tr>
+      <tr><td><code>getAISuggestions(transactions)</code></td><td>gemini-2.5-flash</td><td>Last 60 transactions + financial summary</td><td>AISuggestionsResult object with suggestion cards</td></tr>
+      <tr><td><code>parseBankMessage(message)</code></td><td>gemini-2.0-flash</td><td>Raw SMS string</td><td>Partial Transaction object (amount, type, description, category)</td></tr>
+    </tbody>
+  </table>
+
+  <p><strong>Structured JSON responses</strong>: For <code>getAISuggestions</code> and <code>parseBankMessage</code>, the service uses Gemini's <code>responseMimeType: "application/json"</code> and <code>responseSchema</code> to guarantee structured output, avoiding the need to parse free-form text.</p>
+  <p><strong>AISuggestionsResult structure:</strong></p>
+  <ul>
+    <li><code>summary</code>: 2-sentence financial health overview</li>
+    <li><code>totalIncome</code>, <code>totalExpenses</code>, <code>savingsRate</code>: calculated client-side before sending to Gemini</li>
+    <li><code>suggestions[]</code>: array of <code>AISuggestion</code> objects with: title, description, type ('saving'|'investment'|'warning'), priority ('high'|'medium'|'low'), estimatedImpact (e.g. "Save ₹2,000/month")</li>
+  </ul>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!--  SECTION 5 – PAGES AND COMPONENTS                        -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="doc-page" id="sec5">
+  <div class="section-banner">
+    <div class="banner-tag">Section 5</div>
+    <h1>Pages and Components</h1>
+    <p>Detailed explanation of every screen in SpendWiser.</p>
+  </div>
+
+  <h2 id="sec5-1">5.1 Login / Register Page (<code>LoginPage.tsx</code>)</h2>
+  <p>
+    The <strong>first screen</strong> the user sees. It serves dual purpose — both Login and Registration
+    in a single component, toggling between two modes.
+  </p>
+  <h3>What's on this page:</h3>
+  <ul>
+    <li><strong>Logo</strong> — Large "S" in an indigo rounded square with a glow effect</li>
+    <li><strong>Title</strong> — Changes between "Neural Entry" (login) and "Create Node" (register)</li>
+    <li><strong>Error Banner</strong> — Red warning box (appears only on errors) with an alert icon</li>
+    <li><strong>Name Field</strong> — Only visible in register mode. Labeled "Subject Name"</li>
+    <li><strong>Email Field</strong> — Labeled "Neural Identity". Has a mail icon inside the input</li>
+    <li><strong>Password Field</strong> — Labeled "Access Protocol". Has a lock icon. Min 6 characters</li>
+    <li><strong>Submit Button</strong> — Shows "Initialize Connection" (login) or "Register Protocol" (register). Shows a spinner while loading</li>
+    <li><strong>Mode Toggle</strong> — Text link to switch between login and register</li>
+    <li><strong>Security Footer</strong> — "Secure Neural Encryption Active" badge at the bottom</li>
+  </ul>
+  <h3>How it works:</h3>
+  <ol>
+    <li>User submits the form → <code>handleSubmit()</code> called</li>
+    <li>Based on <code>isLoginMode</code>, calls either <code>AuthService.login()</code> or <code>AuthService.register()</code></li>
+    <li>On success: calls <code>onLogin(user)</code> which sets user state in App.tsx → app renders main layout</li>
+    <li>On error: displays the error message in the red banner</li>
+  </ol>
+
+  <h2 id="sec5-2">5.2 Sidebar Navigation (<code>Sidebar.tsx</code>)</h2>
+  <p>The left-side navigation panel with these menu items:</p>
+  <table>
+    <thead><tr><th>Menu Item</th><th>Tab Value</th><th>Icon</th></tr></thead>
+    <tbody>
+      <tr><td>Neural Overview</td><td>dashboard</td><td>BarChart3</td></tr>
+      <tr><td>Vault Repository</td><td>wallets</td><td>Landmark</td></tr>
+      <tr><td>Ledger Feed</td><td>transactions</td><td>Clock</td></tr>
+      <tr><td>Gemini Core</td><td>insights</td><td>Brain</td></tr>
+      <tr><td>AI Advisor</td><td>suggestions</td><td>Lightbulb</td></tr>
+      <tr><td>Investment Plans</td><td>investments</td><td>TrendingUp</td></tr>
+      <tr><td>User Profile</td><td>profile</td><td>User</td></tr>
+      <tr><td>Settings</td><td>settings</td><td>Settings</td></tr>
+    </tbody>
+  </table>
+  <p>The sidebar is <strong>collapsible on mobile</strong> — a hamburger menu button toggles it. The active item is highlighted with an indigo background and glow effect.</p>
+
+  <h2 id="sec5-3">5.3 Dashboard — "Neural Overview" (<code>Dashboard.tsx</code>)</h2>
+  <p>The main landing page after login. Displays a real-time financial overview.</p>
+  <h3>Components on this page:</h3>
+  <ul>
+    <li><strong>Search Bar (sticky)</strong> — Floating glass search input. Filters the transaction list below in real-time by description and category</li>
+    <li><strong>3 Stats Cards</strong>:
+      <ul>
+        <li><em>Neural Balance</em> — Net balance (income − expense), shows wallet count</li>
+        <li><em>Total Inflow</em> — Sum of all income transactions, green TrendingUp icon</li>
+        <li><em>Total Outflow</em> — Sum of all expense transactions, red TrendingDown icon</li>
+      </ul>
+    </li>
+    <li><strong>Neural Pulse Section</strong> — Budget tracking area. Renders one <code>LiquidGauge</code> component per budget. Each gauge shows: category name, amount spent vs limit. Plus an "Add Module" placeholder card.</li>
+    <li><strong>Spending Landscape</strong> — Recharts <code>BarChart</code> with one bar per spending category. Each bar gets a unique color from a 7-color palette. Custom styled tooltip.</li>
+    <li><strong>Live Feed</strong> — A scrollable mini transaction list sorted newest-first. Each item shows: icon (up/down), description, date, amount. At the bottom: "Export Ledger" button → exports CSV</li>
+  </ul>
+  <h3>LiquidGauge Component (<code>LiquidGauge.tsx</code>)</h3>
+  <p>A custom animated circular gauge that visually fills up based on spending percentage:</p>
+  <ul>
+    <li>Renders as an SVG with a circular arc path</li>
+    <li>Fill color changes: green (under 70%), amber (70-90%), red (above 90%)</li>
+    <li>Shows: category label, amount spent, limit</li>
+  </ul>
+
+  <h2 id="sec5-4">5.4 Vault Repository — "Wallets" (<code>VaultsView.tsx</code>)</h2>
+  <p>Displays all wallet cards in a 3-column grid.</p>
+  <h3>Each wallet card shows:</h3>
+  <ul>
+    <li>Type icon (CreditCard/Wallet/Landmark) in the top-left</li>
+    <li>Live status badge ("Linked" with a pulsing green dot)</li>
+    <li>Wallet type label ("card node", "cash node", etc.)</li>
+    <li>Wallet name as the large heading</li>
+    <li>"Bitstream Balance" label with the current calculated balance</li>
+    <li>Activity indicator at the bottom</li>
+  </ul>
+  <p>Cards have a <strong>holographic depth effect</strong>: a blurred colored blob in the background, a watermark icon, hover animations (scale + rotation), and glassmorphism panel styling.</p>
+  <p>At the end of the grid, there's an "Initialize New Node" placeholder card that could be used to add wallets in future development.</p>
+
+  <h2 id="sec5-5">5.5 Ledger Feed — "Transactions" (<code>LedgerView.tsx</code>)</h2>
+  <p>A full-featured transaction list view with search, export, and delete functionality.</p>
+  <h3>Header section:</h3>
+  <ul>
+    <li>Title "Ledger Feed" with a clock icon</li>
+    <li>Search input: "Query Ledger Bitstream..."</li>
+    <li><strong>Sort Protocol</strong> button (UI only, no sort logic implemented)</li>
+    <li><strong>Export CSV</strong> button — generates a .csv in the browser and triggers download</li>
+    <li><strong>Download Excel</strong> link — fetches <code>/api/transactions/download</code> and downloads .xlsx</li>
+  </ul>
+  <h3>Transaction List:</h3>
+  <ul>
+    <li>Each row (transaction) shows: type icon (emerald up / rose down), description (bold), date badge, category badge (indigo pill), amount, and a trash icon (appears on hover)</li>
+    <li>Hover effect: row background highlights, left border turns indigo, description glows</li>
+    <li>Trash icon calls <code>onDelete(tx.id)</code> which propagates to App.tsx's <code>deleteTransaction</code></li>
+    <li>Empty state shows a centered empty message</li>
+  </ul>
+  <h3>Stats Footer:</h3>
+  <p>4 mini-cards: Total Entries count, "100%" Success Rate (static), "AES-256" Encryption label, "FIX.5 / JSON" Protocol label (branding/aesthetic)</p>
+
+  <h2 id="sec5-6">5.6 Gemini Core — "AI Insights" (<code>InsightsView.tsx</code>)</h2>
+  <p>A page dedicated to single-paragraph AI-generated spending insights.</p>
+  <h3>Layout:</h3>
+  <ul>
+    <li><strong>Hero Section</strong> — Large dark gradient panel with animated glowing background, a Brain icon, title "Gemini Neural Core", and the "Ignite AI Intelligence" button</li>
+    <li><strong>Insights Panel</strong> (left 2/3) — After clicking, displays the Gemini response in a large text box with a fingerprint icon header. Shows confidence score (98.4%) and compute latency (420ms) — these are static UI values for aesthetics</li>
+    <li><strong>Info Sidebar</strong> (right 1/3) — Two info cards: "Pattern Recognition" and "Threat Mitigation" (explains AI capabilities). Plus a "Pro Linked" subscription badge</li>
+  </ul>
+  <h3>Button behavior:</h3>
+  <ul>
+    <li>Disabled if user has no transactions (shows nothing to analyze)</li>
+    <li>Shows a spinning loader while Gemini is processing</li>
+    <li>Displays the plain text response once received</li>
+  </ul>
+
+  <h2 id="sec5-7">5.7 AI Advisor — "Suggestions" (<code>AISuggestionsView.tsx</code>)</h2>
+  <p>More detailed and structured AI financial advice than the Insights page.</p>
+  <h3>Layout after generating:</h3>
+  <ul>
+    <li><strong>Hero</strong> — Emerald-themed panel with a Lightbulb icon and "Get AI Suggestions" button</li>
+    <li><strong>3 Stats Row</strong>: Total Income, Total Expenses, Savings Rate% (calculated client-side)</li>
+    <li><strong>Financial Health Summary</strong> — The 2-sentence summary from Gemini</li>
+    <li><strong>Suggestions Grid</strong> — 3 sections: Warnings (rose), Saving Tips (emerald), Investment Opportunities (indigo). Each section shows 2-column card grid</li>
+  </ul>
+  <h3>SuggestionCard Component:</h3>
+  <ul>
+    <li>Each card shows: type icon, priority badge (high=rose, medium=amber, low=gray), type label</li>
+    <li>Title in bold uppercase</li>
+    <li>2-3 sentence description</li>
+    <li>"Estimated Impact" pill at the bottom (e.g., "Save ₹2,000/month")</li>
+    <li>Cards scale up slightly on hover</li>
+  </ul>
+
+  <h2 id="sec5-8">5.8 Investment Plans (<code>InvestmentPlansView.tsx</code>)</h2>
+  <p>Displays 6 curated Indian investment options with real data, personalized recommendations based on the user's savings rate.</p>
+  <h3>On load:</h3>
+  <ul>
+    <li>Fetches <code>GET /api/investment-rates/scrape</code> to get live/cached rates</li>
+    <li>Calculates monthlyIncome, monthlyExpenses, monthlySavings, savingsRate from current month's transactions</li>
+  </ul>
+  <h3>Recommendation Algorithm:</h3>
+  <table>
+    <thead><tr><th>Savings Rate</th><th>Recommended Plans</th></tr></thead>
+    <tbody>
+      <tr><td>≥ 30%</td><td>Mutual Funds + NPS</td></tr>
+      <tr><td>20–29%</td><td>PPF + NPS</td></tr>
+      <tr><td>10–19%</td><td>PPF + Fixed Deposit</td></tr>
+      <tr><td>&lt; 10%</td><td>Fixed Deposit + Gold</td></tr>
+      <tr><td>Monthly savings ≥ ₹10,000</td><td>Also adds LIC</td></tr>
+    </tbody>
+  </table>
+  <h3>6 Investment Plans:</h3>
+  <table>
+    <thead><tr><th>Plan</th><th>Min Investment</th><th>Risk</th><th>Time Horizon</th><th>Tax Benefit</th></tr></thead>
+    <tbody>
+      <tr><td>PPF</td><td>₹500</td><td>Low</td><td>15 years</td><td>₹1.5L under 80C</td></tr>
+      <tr><td>Mutual Funds (Equity)</td><td>₹100</td><td>High</td><td>5-10 years</td><td>LTCG 20% after 1 yr</td></tr>
+      <tr><td>LIC Insurance</td><td>₹5,000</td><td>Low</td><td>10-20 years</td><td>₹1.5L under 80C</td></tr>
+      <tr><td>NPS</td><td>₹500</td><td>Medium</td><td>20-30 years</td><td>80C + 80CCD(1B)</td></tr>
+      <tr><td>Fixed Deposits</td><td>₹1,000</td><td>Low</td><td>1-10 years</td><td>Taxed as income</td></tr>
+      <tr><td>Gold Investment</td><td>₹100</td><td>Medium</td><td>5-10 years</td><td>LTCG 20% after 2 yrs</td></tr>
+    </tbody>
+  </table>
+  <p>Each plan card shows: icon, recommended badge (if applicable), name, description, min investment, expected return (live rate if available), time horizon, risk level badge, key benefits list, tax benefit, and an "Explore" / "Learn More" button.</p>
+  <p>A <strong>disclaimer box</strong> at the bottom clarifies these are informational only.</p>
+
+  <h2 id="sec5-9">5.9 User Profile (<code>UserProfileView.tsx</code>)</h2>
+  <p>Displays and edits personal and bank information.</p>
+  <h3>Profile Header:</h3>
+  <ul>
+    <li>Large avatar showing the first letter of the user's name (e.g., "A" for Anjali)</li>
+    <li>Name (large, uppercase), email, "Account Active" green status badge</li>
+  </ul>
+  <h3>Personal Information Section:</h3>
+  <ul>
+    <li>Read-only display of Full Name, Email, Account ID (UUID)</li>
+    <li>Edit icon that was present for future implementation (no edit logic currently active in this section)</li>
+  </ul>
+  <h3>Bank Details Section (up to 10 accounts):</h3>
+  <ul>
+    <li><strong>View mode</strong>: Shows each bank account card with: Account Holder, Bank Name, Account Number (masked: ****1234), IFSC Code, Account Type, Mobile Number</li>
+    <li><strong>Edit mode</strong> (click pencil icon): Converts to form inputs for each account. "+" button adds more accounts. Trash icon removes individual accounts. "Save All Details" button POSTs to <code>/api/bank-details</code>, fires <code>refreshTransactions</code> event to trigger demo data loading</li>
+    <li>Supports adding up to 10 bank accounts simultaneously</li>
+    <li>Account numbers entered as password fields for privacy</li>
+  </ul>
+  <h3>Security Note:</h3>
+  <p>An amber-colored callout box explains that bank details are stored locally and never sent to external servers (they are actually sent to the backend, but this note is for user reassurance).</p>
+
+  <h2 id="sec5-10">5.10 Settings (<code>SettingsView.tsx</code>)</h2>
+  <p>App configuration page with 4 sections, all persisted to <code>localStorage['app_settings']</code>.</p>
+  <h3>Notifications & Alerts:</h3>
+  <ul>
+    <li><strong>Push Notifications</strong> toggle — On enable, requests OS permission via <code>Notification.requestPermission()</code></li>
+    <li><strong>Email Alerts</strong> toggle — Weekly spending summaries (notification only, not yet implemented)</li>
+    <li><strong>Sound Effects</strong> toggle — On enable, plays a test beep using the Web Audio API (880Hz sine wave for 100ms)</li>
+  </ul>
+  <h3>Display & Theme:</h3>
+  <ul>
+    <li><strong>Dark Mode</strong> — Always ON (static, cannot be disabled — the entire app is dark-mode only)</li>
+    <li><strong>Currency</strong> dropdown — INR, USD, EUR, GBP (stored in settings; visual preference only)</li>
+  </ul>
+  <h3>Security & Privacy:</h3>
+  <ul>
+    <li><strong>Two-Factor Authentication</strong> toggle (stored preference; not yet implemented)</li>
+    <li><strong>Auto-Sync</strong> toggle (stored preference)</li>
+    <li><strong>Data Retention</strong> dropdown — 30 days, 90 days, 6 months, 1 year, 2 years (stored preference)</li>
+  </ul>
+  <h3>Data Management:</h3>
+  <ul>
+    <li><strong>Export Data</strong> — Fetches transactions from backend (or localStorage fallback), combines with wallets, budgets, settings, and downloads as <code>spendwiser-backup-YYYY-MM-DD.json</code></li>
+    <li><strong>Clear All Data</strong> — Confirms with user, calls <code>DELETE /api/data/clear</code>, removes all localStorage keys, reloads page</li>
+  </ul>
+  <p>A green "Settings Saved" toast notification appears at the bottom-right for 2 seconds whenever settings change.</p>
+
+  <h2 id="sec5-11">5.11 Transaction Modal (<code>TransactionModal.tsx</code>)</h2>
+  <p>A full-screen modal overlay that allows users to log a new transaction.</p>
+  <h3>Fields:</h3>
+  <ul>
+    <li><strong>Type Toggle</strong> — Two buttons: "System Drain" (expense, rose) / "System Inflow" (income, emerald)</li>
+    <li><strong>Amount</strong> — Number input with ₹ prefix, 2 decimal places, required</li>
+    <li><strong>Target Node</strong> (Wallet) — Dropdown with wallet names</li>
+    <li><strong>Description</strong> — Text input, required</li>
+    <li><strong>Classification</strong> (Category) — Dropdown with all Category enum values</li>
+    <li><strong>Timestamp</strong> (Date) — Date picker, defaults to today</li>
+    <li><strong>Neural Scan</strong> (Optional Receipt) — Camera button opens file picker for image; Gemini AI auto-fills amount, category, description, date from the image</li>
+  </ul>
+  <h3>Buttons:</h3>
+  <ul>
+    <li>"Abort Entry" → closes modal</li>
+    <li>"Authorize Protocol" → validates and submits</li>
+  </ul>
+  <p>The modal appears with a backdrop blur effect and animates in. A light scan animation runs across the submit button on hover.</p>
+
+  <h2 id="sec5-12">5.12 SMS Parser Modal (<code>MessageParserModal.tsx</code>)</h2>
+  <p>Allows users to paste a bank SMS text and automatically create a transaction from it.</p>
+  <h3>Process:</h3>
+  <ol>
+    <li>User clicks "Decrypt SMS" in the header</li>
+    <li>Modal opens with a textarea for SMS input</li>
+    <li>User pastes SMS text (e.g., "Rs. 500 debited from your HDFC account...")</li>
+    <li>Clicks "Parse SMS" → calls <code>parseBankMessage(text)</code> from geminiService (uses Gemini 2.0 Flash)</li>
+    <li>Gemini returns parsed data → pre-fills the transaction form fields</li>
+    <li>User reviews and confirms → transaction is saved</li>
+  </ol>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!--  SECTION 6 – API REFERENCE                                -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="doc-page" id="sec6">
+  <div class="section-banner">
+    <div class="banner-tag">Section 6</div>
+    <h1>API Reference</h1>
+    <p>Every endpoint, its request format, and response structure.</p>
+  </div>
+
+  <p>All API endpoints are prefixed with <code>/api</code> and the server runs on <code>http://localhost:5000</code> by default in development.</p>
+
+  <div class="callout callout-info">
+    <div class="callout-label">🔒 Authentication</div>
+    Protected endpoints require: <code>Authorization: Bearer &lt;jwt-token&gt;</code> in the request headers.
+    The JWT token is obtained from the login response.
+  </div>
+
+  <h2 id="sec6-1">6.1 Authentication Endpoints</h2>
+
+  <div class="endpoint">
+    <div class="endpoint-header">
+      <span class="method method-post">POST</span>
+      <span class="endpoint-path">/api/auth/register</span>
+    </div>
+    <div class="endpoint-body">
+      <p><strong>Rate limit:</strong> 3 registrations per hour per IP</p>
+      <p><strong>Request body:</strong></p>
+      <pre><code>{ "email": "user@example.com", "password": "min6chars", "name": "Alice" }</code></pre>
+      <p><strong>Success (201):</strong></p>
+      <pre><code>{ "id": "uuid-string", "email": "user@example.com", "name": "Alice" }</code></pre>
+      <p><strong>Error (400):</strong> <code>{ "error": "User already exists" }</code></p>
+      <p><strong>Error (503):</strong> <code>{ "error": "MongoDB not connected. ..." }</code></p>
+    </div>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-header">
+      <span class="method method-post">POST</span>
+      <span class="endpoint-path">/api/auth/login</span>
+    </div>
+    <div class="endpoint-body">
+      <p><strong>Rate limit:</strong> 5 attempts per 15 minutes (skips counting successful logins)</p>
+      <p><strong>Request body:</strong></p>
+      <pre><code>{ "email": "user@example.com", "password": "yourpassword" }</code></pre>
+      <p><strong>Success (200):</strong></p>
+      <pre><code>{ "token": "eyJhbGciOiJIUzI1NiIs...", "user": { "id": "uuid", "email": "...", "name": "..." } }</code></pre>
+      <p><strong>Error (401):</strong> <code>{ "error": "Invalid email or password" }</code></p>
+    </div>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-header">
+      <span class="method method-get">GET</span>
+      <span class="endpoint-path">/api/auth/user/:userId</span>
+    </div>
+    <div class="endpoint-body">
+      <p><strong>Auth:</strong> Required | Returns user object for given userId</p>
+    </div>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-header">
+      <span class="method method-put">PUT</span>
+      <span class="endpoint-path">/api/auth/user/:userId</span>
+    </div>
+    <div class="endpoint-body">
+      <p><strong>Auth:</strong> Required | <strong>Body:</strong> <code>{ "name": "New Name", "password": "newpass" }</code> (both optional)</p>
+    </div>
+  </div>
+
+  <h2 id="sec6-2">6.2 Transaction Endpoints</h2>
+
+  <div class="endpoint">
+    <div class="endpoint-header">
+      <span class="method method-get">GET</span>
+      <span class="endpoint-path">/api/transactions</span>
+    </div>
+    <div class="endpoint-body">
+      <p><strong>Auth:</strong> Required | Returns all transactions sorted by date descending.</p>
+      <pre><code>[{ "id": "uuid", "amount": 500, "type": "expense", "category": "Food", "description": "Swiggy", "date": "2026-06-15", "walletId": "1", "currency": "INR", "source": "manual" }, ...]</code></pre>
+    </div>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-header">
+      <span class="method method-post">POST</span>
+      <span class="endpoint-path">/api/transactions</span>
+    </div>
+    <div class="endpoint-body">
+      <p><strong>Auth:</strong> Required | <strong>Body:</strong></p>
+      <pre><code>{ "amount": 500, "type": "expense", "category": "Food", "description": "Swiggy Order", "date": "2026-06-15", "walletId": "1", "currency": "INR" }</code></pre>
+      <p><strong>Success (201):</strong> Returns the created transaction with auto-generated <code>id</code></p>
+    </div>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-header">
+      <span class="method method-put">PUT</span>
+      <span class="endpoint-path">/api/transactions/:id</span>
+    </div>
+    <div class="endpoint-body">
+      <p><strong>Auth:</strong> Required | Send partial or full transaction fields to update</p>
+    </div>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-header">
+      <span class="method method-delete">DELETE</span>
+      <span class="endpoint-path">/api/transactions/:id</span>
+    </div>
+    <div class="endpoint-body">
+      <p><strong>Auth:</strong> Required | Returns <code>{ "message": "Transaction deleted" }</code></p>
+    </div>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-header">
+      <span class="method method-get">GET</span>
+      <span class="endpoint-path">/api/transactions/download</span>
+    </div>
+    <div class="endpoint-body">
+      <p><strong>Auth:</strong> Not required | Downloads <code>spendwiser-transactions.xlsx</code> file</p>
+    </div>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-header">
+      <span class="method method-delete">DELETE</span>
+      <span class="endpoint-path">/api/transactions/data/clear</span>
+    </div>
+    <div class="endpoint-body">
+      <p><strong>Auth:</strong> Not required | Deletes all transactions from MongoDB AND clears Excel file. Use with extreme caution!</p>
+    </div>
+  </div>
+
+  <h2 id="sec6-3">6.3 Bank Details Endpoints</h2>
+
+  <div class="endpoint">
+    <div class="endpoint-header">
+      <span class="method method-get">GET</span>
+      <span class="endpoint-path">/api/bank-details/:userId</span>
+    </div>
+    <div class="endpoint-body">
+      <p><strong>Auth:</strong> Required | Returns the BankDetails document for the userId</p>
+    </div>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-header">
+      <span class="method method-post">POST</span>
+      <span class="endpoint-path">/api/bank-details</span>
+    </div>
+    <div class="endpoint-body">
+      <p><strong>Auth:</strong> Required | Upsert operation (creates or replaces)</p>
+      <pre><code>{ "userId": "uuid", "accounts": [{ "bankName": "HDFC", "accountNumber": "1234567890", "ifscCode": "HDFC0001234", "accountType": "Savings", "mobileNumber": "+91 9876543210", "accountHolder": "Alice" }] }</code></pre>
+      <p>On first save with accounts present, creates 4 sample transactions tagged <code>source: "bank_sync"</code></p>
+    </div>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-header">
+      <span class="method method-delete">DELETE</span>
+      <span class="endpoint-path">/api/bank-details/:userId</span>
+    </div>
+    <div class="endpoint-body">
+      <p><strong>Auth:</strong> Required | Removes bank details for the user</p>
+    </div>
+  </div>
+
+  <h2 id="sec6-4">6.4 SMS Webhook</h2>
+
+  <div class="endpoint">
+    <div class="endpoint-header">
+      <span class="method method-post">POST</span>
+      <span class="endpoint-path">/api/sms/webhook</span>
+    </div>
+    <div class="endpoint-body">
+      <p><strong>Auth:</strong> Not required | <strong>Rate limit:</strong> 50 per hour</p>
+      <pre><code>{ "message": "Rs.500 debited from your account. Balance: Rs.25000", "from": "+91XXXXXXXXXX", "timestamp": "2026-06-15T10:30:00Z" }</code></pre>
+      <p><strong>Success (201):</strong></p>
+      <pre><code>{ "success": true, "transaction": { "id": "...", "amount": 500, "type": "expense", ... } }</code></pre>
+      <p><strong>Error (400):</strong> <code>{ "error": "Could not parse transaction from SMS" }</code> (if no regex pattern matched)</p>
+    </div>
+  </div>
+
+  <h2 id="sec6-5">6.5 Investment Rates</h2>
+
+  <div class="endpoint">
+    <div class="endpoint-header">
+      <span class="method method-get">GET</span>
+      <span class="endpoint-path">/api/investment-rates/scrape</span>
+    </div>
+    <div class="endpoint-body">
+      <p><strong>Auth:</strong> Not required | Returns cached investment rates instantly (no scraping on request)</p>
+      <pre><code>{ "ppf": "7.1% p.a. (Live)", "fixed-deposit": "6.5% p.a.", "nps": "9.0% p.a.", "lic": "5.5% p.a.", "gold": "10.5% p.a.", "mutual-funds": "14.0% p.a." }</code></pre>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!--  SECTION 7 – SECURITY                                     -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="doc-page" id="sec7">
+  <div class="section-banner">
+    <div class="banner-tag">Section 7</div>
+    <h1>Security</h1>
+    <p>How SpendWiser protects user data at every layer.</p>
+  </div>
+
+  <table>
+    <thead><tr><th>Security Layer</th><th>Mechanism</th><th>Details</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Password Storage</strong></td><td>bcryptjs hashing</td><td>Passwords are hashed with bcrypt (salt rounds = 10) before storage. Plain passwords NEVER saved.</td></tr>
+      <tr><td><strong>Authentication</strong></td><td>JWT Bearer Token</td><td>Login returns a signed JWT with 7-day expiry. All protected routes verify this token via middleware.</td></tr>
+      <tr><td><strong>Rate Limiting</strong></td><td>express-rate-limit</td><td>General: 100 req/15min. Login: 5 attempts/15min. Register: 3/hour. SMS: 50/hour.</td></tr>
+      <tr><td><strong>CORS Policy</strong></td><td>cors package</td><td>Only allows requests from the configured FRONTEND_URL. Credentials enabled for cookie support.</td></tr>
+      <tr><td><strong>Input Validation</strong></td><td>Joi schemas</td><td>All API inputs are validated before reaching business logic — prevents malformed data injection.</td></tr>
+      <tr><td><strong>Account Masking</strong></td><td>Client-side</td><td>Bank account numbers shown as ****XXXX (last 4 digits only) in the UI.</td></tr>
+      <tr><td><strong>Local Session</strong></td><td>localStorage</td><td>Session stored client-side only. No server-side session storage reduces attack surface.</td></tr>
+      <tr><td><strong>Error Handling</strong></td><td>Global middleware</td><td>All unhandled errors return generic "Internal Server Error" — no stack traces exposed to clients.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout callout-warning">
+    <div class="callout-label">⚠️ Known Security Notes for Production</div>
+    <ul>
+      <li>The <code>JWT_SECRET</code> defaults to 'your-secret-key' if not set. <strong>Always set a strong secret in .env for production.</strong></li>
+      <li>The <code>/api/transactions/download</code> and <code>/api/transactions/data/clear</code> endpoints do not require authentication — they should be protected in a production environment.</li>
+      <li>The Gemini API key is exposed client-side via <code>VITE_GEMINI_API_KEY</code>. For production, consider proxying AI calls through the backend to keep the key server-side.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!--  SECTION 8 – DATA STORAGE                                 -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="doc-page" id="sec8">
+  <div class="section-banner">
+    <div class="banner-tag">Section 8</div>
+    <h1>Data Storage & Backup</h1>
+    <p>Where every piece of data lives and how it's protected.</p>
+  </div>
+
+  <table>
+    <thead><tr><th>Data Type</th><th>Primary Storage</th><th>Fallback</th><th>Security Level</th></tr></thead>
+    <tbody>
+      <tr><td>User accounts (email, hashed password, name)</td><td>MongoDB — <code>users</code> collection</td><td>None (requires DB)</td><td>⭐⭐⭐⭐⭐</td></tr>
+      <tr><td>Transactions (amount, type, category, date)</td><td>MongoDB — <code>transactions</code> collection</td><td>data.xlsx Excel file</td><td>⭐⭐⭐⭐⭐</td></tr>
+      <tr><td>Bank details (account number, IFSC, etc.)</td><td>MongoDB — <code>bankdetails</code> collection</td><td>localStorage (in edit mode)</td><td>⭐⭐⭐⭐</td></tr>
+      <tr><td>Investment rates (PPF, FD, etc.)</td><td>MongoDB — <code>rates</code> collection</td><td>rates.json file</td><td>⭐⭐⭐</td></tr>
+      <tr><td>Wallets (name, balance, color)</td><td>Browser localStorage</td><td>Default hardcoded values</td><td>⭐⭐⭐</td></tr>
+      <tr><td>Budgets (category, limit, spent)</td><td>Browser localStorage</td><td>Default hardcoded values</td><td>⭐⭐⭐</td></tr>
+      <tr><td>Settings (notifications, currency, etc.)</td><td>Browser localStorage</td><td>Default hardcoded values</td><td>⭐⭐⭐</td></tr>
+      <tr><td>Auth session (user object)</td><td>Browser localStorage</td><td>N/A</td><td>⭐⭐⭐</td></tr>
+      <tr><td>JWT token</td><td>Browser localStorage</td><td>N/A</td><td>⭐⭐⭐</td></tr>
+    </tbody>
+  </table>
+
+  <h3>localStorage Keys Used by SpendWiser</h3>
+  <table>
+    <thead><tr><th>Key</th><th>Contents</th></tr></thead>
+    <tbody>
+      <tr><td><code>smartspend_session_v1</code></td><td>JSON-stringified User object (id, email, name)</td></tr>
+      <tr><td><code>smartspend_token</code></td><td>JWT Bearer token string</td></tr>
+      <tr><td><code>app_transactions_v2</code></td><td>Array of Transaction objects (localStorage cache, synced from DB)</td></tr>
+      <tr><td><code>app_wallets_v2</code></td><td>Array of Wallet objects</td></tr>
+      <tr><td><code>app_budgets_v2</code></td><td>Array of Budget objects with live spent amounts</td></tr>
+      <tr><td><code>app_settings</code></td><td>AppSettings object (notifications, theme, etc.)</td></tr>
+      <tr><td><code>app_bank_details_list</code></td><td>Array of BankDetails objects (local copy)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Excel Backup (data.xlsx)</h3>
+  <p>
+    The file <code>backend/data.xlsx</code> serves as a <strong>persistent offline backup</strong>
+    for transactions when MongoDB is unavailable. It has one sheet "Transactions" with columns:
+    id, amount, type, category, description, date, walletId, currency, createdAt, source, smsFrom.
+  </p>
+  <p>It is also available for direct download via <code>GET /api/transactions/download</code>.</p>
+
+  <div class="callout callout-success">
+    <div class="callout-label">✅ Data Export</div>
+    Users can export a full JSON backup of all their data from Settings → Export Data.
+    The file contains: transactions (from DB or localStorage), wallets, budgets, settings, and export date.
+    File name: <code>spendwiser-backup-YYYY-MM-DD.json</code>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!--  SECTION 9 – DEPLOYMENT                                   -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="doc-page" id="sec9">
+  <div class="section-banner">
+    <div class="banner-tag">Section 9</div>
+    <h1>Deployment</h1>
+    <p>How to host SpendWiser on Vercel for free.</p>
+  </div>
+
+  <h2>Vercel Deployment Architecture</h2>
+  <p>
+    SpendWiser is configured for <strong>zero-configuration Vercel deployment</strong> using
+    <code>vercel.json</code>:
+  </p>
+  <pre><code>{
+  "outputDirectory": "client/dist",    // built React app
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/index" },  // backend API
+    { "source": "/(.*)", "destination": "/index.html" }       // SPA routing
+  ]
+}</code></pre>
+
+  <h3>How it works on Vercel:</h3>
+  <ol>
+    <li><code>client/dist</code> — the built React app (Vite output) is served as static files</li>
+    <li>All <code>/api/*</code> requests are routed to <code>api/index.js</code> which re-exports the Express app as a Vercel Serverless Function</li>
+    <li>All other routes redirect to <code>index.html</code> — enabling client-side React Router navigation</li>
+  </ol>
+
+  <h3>Deployment Steps:</h3>
+  <ol>
+    <li>Push the repository to GitHub</li>
+    <li>Import project into Vercel Dashboard (<a href="https://vercel.com">vercel.com</a>)</li>
+    <li>Add Environment Variables in Vercel Settings:
+      <ul>
+        <li><code>MONGODB_URI</code> — MongoDB Atlas connection string</li>
+        <li><code>VITE_GEMINI_API_KEY</code> — Google Gemini API key</li>
+        <li><code>JWT_SECRET</code> — Strong random string (e.g., 64 chars)</li>
+      </ul>
+    </li>
+    <li>Deploy — Vercel auto-builds and deploys</li>
+  </ol>
+
+  <div class="callout callout-warning">
+    <div class="callout-label">⚠️ Important for Vercel Deployment</div>
+    <ul>
+      <li>On Vercel, the backend runs as a <strong>serverless function</strong> — there is no persistent server process. The Excel file fallback (<code>data.xlsx</code>) uses the <code>/tmp</code> directory which is ephemeral (wiped between invocations)</li>
+      <li>You <strong>must</strong> use MongoDB Atlas (cloud) on Vercel — local MongoDB won't work</li>
+      <li>The scraping cron job won't run on Vercel serverless — you'd need a separate cron service or Vercel Cron features</li>
+    </ul>
+  </div>
+
+  <h2>Local Development Architecture</h2>
+  <p>In development, the frontend (Vite, port 3000/3001) and backend (Express, port 5000) run as separate processes. Vite's dev server proxies <code>/api</code> requests to Express. The root <code>package.json</code> scripts use <code>concurrently</code> to run both simultaneously.</p>
+  <pre><code>npm run dev   # runs both frontend and backend concurrently</code></pre>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!--  SECTION 10 – SETUP & INSTALLATION                        -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="doc-page" id="sec10">
+  <div class="section-banner">
+    <div class="banner-tag">Section 10</div>
+    <h1>Setup & Installation Guide</h1>
+    <p>Step-by-step guide to run SpendWiser locally.</p>
+  </div>
+
+  <h2>Prerequisites</h2>
+  <ul>
+    <li><strong>Node.js</strong> v18 or higher — <a href="https://nodejs.org">nodejs.org</a></li>
+    <li><strong>MongoDB</strong> (local) — Community Edition, OR MongoDB Atlas (cloud) — <a href="https://mongodb.com">mongodb.com</a></li>
+    <li><strong>Google Gemini API Key</strong> (free) — <a href="https://aistudio.google.com">aistudio.google.com</a></li>
+    <li>A modern web browser (Chrome, Firefox, Edge)</li>
+  </ul>
+
+  <h2>Step 1: Clone/Download the Project</h2>
+  <pre><code>git clone https://github.com/Varshitha61/Spend-Wiser.git
+cd spendwiser</code></pre>
+
+  <h2>Step 2: Install All Dependencies</h2>
+  <pre><code># Install root + frontend dependencies
+npm install
+
+# Install backend dependencies
+cd backend
+npm install
+cd ..</code></pre>
+
+  <h2>Step 3: Configure Backend Environment</h2>
+  <p>Create/edit <code>backend/.env</code>:</p>
+  <pre><code>PORT=5000
+MONGODB_URI=mongodb://localhost:27017/spendwiser
+JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
+JWT_EXPIRE=7d
+
+# Optional: Email (for welcome emails)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your-email@gmail.com
+SMTP_PASS=your-gmail-app-password
+
+# Frontend URL (for CORS)
+FRONTEND_URL=http://localhost:3001</code></pre>
+
+  <h2>Step 4: Configure Frontend Environment</h2>
+  <p>Create/edit <code>client/.env.local</code>:</p>
+  <pre><code>VITE_GEMINI_API_KEY=your-gemini-api-key-here
+VITE_API_BASE_URL=http://localhost:5000</code></pre>
+
+  <h2>Step 5: Start MongoDB</h2>
+  <pre><code># Windows (MongoDB should auto-start as a service)
+# If not: net start MongoDB
+
+# Mac
+brew services start mongodb-community
+
+# Linux
+sudo systemctl start mongod
+
+# Or use MongoDB Compass GUI to connect</code></pre>
+
+  <h2>Step 6: Start the Application</h2>
+  <pre><code># From the root directory — starts both backend (port 5000) and frontend (port 3000/3001)
+npm run dev</code></pre>
+
+  <h2>Step 7: Open in Browser</h2>
+  <ul>
+    <li><strong>Frontend:</strong> <code>http://localhost:3001</code> (or 3000)</li>
+    <li><strong>Backend API:</strong> <code>http://localhost:5000</code></li>
+    <li>Register a new account or use a test account</li>
+  </ul>
+
+  <div class="callout callout-success">
+    <div class="callout-label">✅ Quick Verification</div>
+    Open your browser to the frontend URL. You should see the SpendWiser login page with a dark background.
+    Try registering with a test email. If the backend is running correctly, you'll be logged in and see the dashboard.
+    The console should show: <code>🚀 Server running on port 5000</code> and <code>✅ MongoDB connected successfully</code>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!--  SECTION 11 – ENVIRONMENT VARIABLES                       -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="doc-page" id="sec11">
+  <div class="section-banner">
+    <div class="banner-tag">Section 11</div>
+    <h1>Environment Variables</h1>
+    <p>Complete reference of all configuration variables.</p>
+  </div>
+
+  <h2>Backend (.env)</h2>
+  <table>
+    <thead><tr><th>Variable</th><th>Required</th><th>Default</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>PORT</code></td><td>No</td><td>5000</td><td>Port the Express server listens on</td></tr>
+      <tr><td><code>MONGODB_URI</code></td><td>Yes</td><td>mongodb://localhost:27017/spendwiser</td><td>MongoDB connection string. Use Atlas URI for cloud</td></tr>
+      <tr><td><code>JWT_SECRET</code></td><td>Yes</td><td>'your-secret-key' (unsafe!)</td><td>Secret key for signing/verifying JWT tokens. Use 64+ random chars in production</td></tr>
+      <tr><td><code>JWT_EXPIRE</code></td><td>No</td><td>'7d'</td><td>JWT token expiry duration</td></tr>
+      <tr><td><code>FRONTEND_URL</code></td><td>No</td><td>http://localhost:3001</td><td>Allowed origin for CORS requests</td></tr>
+      <tr><td><code>SMTP_HOST</code></td><td>No</td><td>smtp.gmail.com</td><td>SMTP server for sending welcome emails</td></tr>
+      <tr><td><code>SMTP_PORT</code></td><td>No</td><td>587</td><td>SMTP port (587=TLS, 465=SSL)</td></tr>
+      <tr><td><code>SMTP_USER</code></td><td>No</td><td>—</td><td>SMTP auth username (email address). If not set, email sending is skipped</td></tr>
+      <tr><td><code>SMTP_PASS</code></td><td>No</td><td>—</td><td>SMTP auth password (use Gmail App Password, not regular password)</td></tr>
+      <tr><td><code>NODE_ENV</code></td><td>No</td><td>'development'</td><td>Set to 'production' on Vercel to prevent server.listen() (Vercel manages this)</td></tr>
+      <tr><td><code>VERCEL</code></td><td>Auto</td><td>—</td><td>Set automatically by Vercel to '1'. Used to switch Excel storage to /tmp dir</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Frontend (client/.env.local)</h2>
+  <table>
+    <thead><tr><th>Variable</th><th>Required</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>VITE_GEMINI_API_KEY</code></td><td>Yes (for AI)</td><td>Google Gemini API key. Get free key from Google AI Studio. Without this, all AI features are disabled.</td></tr>
+      <tr><td><code>VITE_API_BASE_URL</code></td><td>No</td><td>Backend API base URL for development</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout callout-danger">
+    <div class="callout-label">🔴 Security Warning</div>
+    <ul>
+      <li>Never commit <code>.env</code> files to Git (they are already in <code>.gitignore</code>)</li>
+      <li>The <code>VITE_GEMINI_API_KEY</code> is included in the browser bundle — anyone can see it using DevTools. Restrict API key usage in Google Cloud Console to prevent abuse.</li>
+      <li>Always use a strong <code>JWT_SECRET</code> in production — at least 64 random characters</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!--  SECTION 12 – TROUBLESHOOTING                             -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="doc-page" id="sec12">
+  <div class="section-banner">
+    <div class="banner-tag">Section 12</div>
+    <h1>Troubleshooting</h1>
+    <p>Common issues and how to fix them.</p>
+  </div>
+
+  <table>
+    <thead><tr><th>Problem</th><th>Symptoms</th><th>Solution</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>MongoDB Connection Error</strong></td>
+        <td>"MongoDB not connected" in API responses; ECONNREFUSED error in console</td>
+        <td>1. Ensure MongoDB service is running (<code>mongosh</code> to test) <br/>2. On Windows: Services → MongoDB → Start <br/>3. If using Atlas: Check connection string, whitelist your IP <br/>4. On some ISPs: DNS blocks MongoDB SRV. Try Google DNS (8.8.8.8) <br/>5. App will fallback to Excel storage automatically</td>
+      </tr>
+      <tr>
+        <td><strong>Port Already in Use</strong></td>
+        <td>"EADDRINUSE: address already in use :::5000"</td>
+        <td>1. Kill the process using port 5000: <code>netstat -ano | findstr :5000</code> then <code>taskkill /PID [pid] /F</code> <br/>2. Or change PORT in backend/.env</td>
+      </tr>
+      <tr>
+        <td><strong>AI Features Not Working</strong></td>
+        <td>No insights generated, buttons do nothing</td>
+        <td>1. Check that <code>VITE_GEMINI_API_KEY</code> is set in <code>client/.env.local</code> <br/>2. Check browser console for "VITE_GEMINI_API_KEY is not set" warning <br/>3. Verify the key is valid at aistudio.google.com</td>
+      </tr>
+      <tr>
+        <td><strong>Login Returns 401</strong></td>
+        <td>"Invalid email or password" even with correct credentials</td>
+        <td>1. Ensure MongoDB is connected (user data lives in DB) <br/>2. Check if you registered with the exact same email (case-insensitive) <br/>3. Try registering a new account</td>
+      </tr>
+      <tr>
+        <td><strong>CORS Error</strong></td>
+        <td>"Access-Control-Allow-Origin" error in browser console</td>
+        <td>1. Set <code>FRONTEND_URL</code> in backend/.env to match your frontend URL exactly <br/>2. Ensure backend is running before frontend <br/>3. Check Vite proxy config in <code>vite.config.ts</code></td>
+      </tr>
+      <tr>
+        <td><strong>SMS Parsing Fails</strong></td>
+        <td>"Could not parse transaction from SMS"</td>
+        <td>1. The SMS format must contain "Rs.", "₹", or "INR" followed by a number <br/>2. Must contain "debited"/"paid"/"received"/"credited" keywords <br/>3. Try using the AI parser (Gemini) instead — it handles more formats</td>
+      </tr>
+      <tr>
+        <td><strong>Transactions Not Loading</strong></td>
+        <td>Dashboard shows empty, no transactions visible</td>
+        <td>1. Check backend is running on port 5000 <br/>2. Open browser DevTools → Network → check /api/transactions response <br/>3. If 401: ensure you're logged in and JWT token is valid <br/>4. Check localStorage for 'app_transactions_v2' as cache</td>
+      </tr>
+      <tr>
+        <td><strong>Missing Dependencies</strong></td>
+        <td>"Cannot find module 'express'" or similar errors</td>
+        <td>Run: <code>npm install</code> in both root and <code>backend/</code> directories</td>
+      </tr>
+      <tr>
+        <td><strong>Vercel Build Fails</strong></td>
+        <td>Build error on Vercel dashboard</td>
+        <td>1. Ensure all environment variables are set in Vercel project settings <br/>2. Check that <code>client/dist</code> is in <code>outputDirectory</code> in vercel.json <br/>3. Check build logs for specific TypeScript errors</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Debug Tips</h2>
+  <ol>
+    <li>Open browser Developer Tools (F12) → Console tab — any errors will appear here</li>
+    <li>Check the Network tab → look at API calls to <code>/api/*</code> — check status codes and response bodies</li>
+    <li>Check the backend terminal for server-side errors</li>
+    <li>Test API endpoints directly with a tool like Postman or curl</li>
+  </ol>
+
+  <pre><code># Test backend is running
+curl http://localhost:5000/api/investment-rates/scrape
+
+# Test login (should return token)
+curl -X POST http://localhost:5000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@test.com","password":"password123"}'</code></pre>
+
+  <hr/>
+
+  <div class="callout callout-success">
+    <div class="callout-label">🎉 Congratulations!</div>
+    You've read the complete SpendWiser technical documentation. You now understand every file,
+    every endpoint, every component, and every concept in this project.
+    Feel free to extend the app — add new features, fix bugs, or use it as a learning resource
+    for MERN stack development with AI integration.
+  </div>
+
+  <br/>
+  <p style="text-align:center; color:#64748b; font-size:11pt; margin-top:32px;">
+    <strong>SpendWiser</strong> — Personal Finance Management App<br/>
+    📄 Technical Documentation v2.5.0 &nbsp;|&nbsp; June 2026<br/>
+    Built with ❤️ using React, Node.js, Express, MongoDB, and Google Gemini AI
+  </p>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!--  PRINT BUTTON                                             -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<button class="print-btn no-print" onclick="window.print()">
+  🖨️ Save as PDF
+</button>
+
+</body>
+</html>

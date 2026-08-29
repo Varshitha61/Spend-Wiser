@@ -78,7 +78,12 @@ const App: React.FC = () => {
         // Fetch transactions from backend
         const fetchTransactions = async () => {
             try {
-                const response = await fetch('/api/transactions');
+                const token = AuthService.getToken();
+                const response = await fetch('/api/transactions', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
                 if (response.ok) {
                     const data = await response.json();
                     setTransactions(data);
@@ -144,9 +149,13 @@ const App: React.FC = () => {
 
         // Insert into MongoDB backend
         try {
+            const token = AuthService.getToken();
             const res = await fetch('/api/transactions', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify(newTx)
             });
             if (!res.ok) {
@@ -194,7 +203,13 @@ const App: React.FC = () => {
     const deleteTransaction = async (id: string) => {
         setTransactions(prev => prev.filter(t => t.id !== id));
         try {
-            await fetch(`/api/transactions/${id}`, { method: 'DELETE' });
+            const token = AuthService.getToken();
+            await fetch(`/api/transactions/${id}`, { 
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
         } catch (err) {
             console.error("Failed to delete from backend:", err);
         }

@@ -1,6 +1,7 @@
 import { User } from '../types';
 
 const SESSION_KEY = 'smartspend_session_v1';
+const TOKEN_KEY = 'smartspend_token';
 
 export const AuthService = {
   login: async (email: string, password: string): Promise<User> => {
@@ -16,9 +17,13 @@ export const AuthService = {
         throw new Error(error.error || 'Login failed');
       }
 
-      const user = await response.json();
-      localStorage.setItem(SESSION_KEY, JSON.stringify(user));
-      return user;
+      const data = await response.json();
+      
+      // Save token and user
+      localStorage.setItem(TOKEN_KEY, data.token);
+      localStorage.setItem(SESSION_KEY, JSON.stringify(data.user));
+      
+      return data.user;
     } catch (err) {
       console.error('Login error:', err);
       throw err;
@@ -38,7 +43,13 @@ export const AuthService = {
         throw new Error(error.error || 'Registration failed');
       }
 
-      const user = await response.json();
+      const data = await response.json();
+      
+      if (data.token) {
+        localStorage.setItem(TOKEN_KEY, data.token);
+      }
+      
+      const user = data.user || data;
       localStorage.setItem(SESSION_KEY, JSON.stringify(user));
       return user;
     } catch (err) {
@@ -49,6 +60,7 @@ export const AuthService = {
 
   logout: () => {
     localStorage.removeItem(SESSION_KEY);
+    localStorage.removeItem(TOKEN_KEY);
   },
 
   getCurrentUser: (): User | null => {
@@ -56,11 +68,19 @@ export const AuthService = {
     return session ? JSON.parse(session) : null;
   },
 
+  getToken: (): string | null => {
+    return localStorage.getItem(TOKEN_KEY);
+  },
+
   updateProfile: async (userId: string, name?: string, password?: string): Promise<User> => {
     try {
+      const token = AuthService.getToken();
       const response = await fetch(`/api/auth/user/${userId}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({ name, password })
       });
 
