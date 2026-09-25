@@ -4,28 +4,26 @@ const path = require('path');
 
 const isVercel = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production';
 
-if (isVercel) {
-  try {
+// Enforce valid file: protocol for SQLite database URL
+if (!process.env.DATABASE_URL || !process.env.DATABASE_URL.startsWith('file:')) {
+  if (isVercel) {
     const tmpDbPath = path.join('/tmp', 'dev.db');
     const bundledDbPath = path.join(__dirname, '..', 'prisma', 'dev.db');
     
-    if (!fs.existsSync(tmpDbPath)) {
-      if (fs.existsSync(bundledDbPath)) {
-        fs.copyFileSync(bundledDbPath, tmpDbPath);
-        console.log('✅ Copied SQLite database to /tmp/dev.db for Vercel serverless execution');
+    try {
+      if (!fs.existsSync(tmpDbPath)) {
+        if (fs.existsSync(bundledDbPath)) {
+          fs.copyFileSync(bundledDbPath, tmpDbPath);
+          console.log('✅ Copied SQLite database to /tmp/dev.db for Vercel');
+        }
       }
+    } catch (err) {
+      console.error('⚠️ Error copying SQLite db to /tmp:', err.message);
     }
-    
-    if (fs.existsSync(tmpDbPath)) {
-      process.env.DATABASE_URL = `file:${tmpDbPath}`;
-    }
-  } catch (err) {
-    console.error('⚠️ Could not set up SQLite in /tmp for Vercel:', err.message);
+    process.env.DATABASE_URL = `file:${tmpDbPath}`;
+  } else {
+    process.env.DATABASE_URL = `file:${path.join(__dirname, '..', 'prisma', 'dev.db')}`;
   }
-}
-
-if (!process.env.DATABASE_URL) {
-  process.env.DATABASE_URL = 'file:./dev.db';
 }
 
 let prisma;
