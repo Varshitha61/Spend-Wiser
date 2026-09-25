@@ -26,6 +26,8 @@ backend/rates.json
 api/rates.json
 data.xlsx
 rates.json
+*.db
+*.db-journal
 
 # Logs
 logs
@@ -39,3 +41,4 @@ lerna-debug.log*
 # Misc
 .vercel
 .next
+.neon

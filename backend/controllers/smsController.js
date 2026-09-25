@@ -1,6 +1,5 @@
-const mongoose = require('mongoose');
+const prisma = require('../utils/prisma');
 const { v4: uuidv4 } = require('uuid');
-const Transaction = require('../models/Transaction');
 const { parseBankSMS } = require('../utils/smsParser');
 const { readTransactionsFromExcel, writeTransactionsToExcel } = require('../services/excelService');
 
@@ -23,17 +22,19 @@ exports.receiveWebhook = async (req, res) => {
       date: timestamp || new Date().toISOString().split('T')[0],
       walletId: '1',
       currency: parsedTx.currency || 'INR',
-      createdAt: new Date().toISOString(),
       source: 'sms',
       smsFrom: from
     };
 
-    if ((mongoose.connection.readyState === 1 || mongoose.connection.readyState === 2)) {
-      const tx = new Transaction(newTransaction);
-      await tx.save();
+    try {
+      const tx = await prisma.transaction.create({
+        data: newTransaction
+      });
       return res.status(201).json({ success: true, transaction: tx });
-    } else {
+    } catch (dbErr) {
+      console.error('Prisma save failed in SMS webhook, falling back to Excel:', dbErr.message);
       const transactions = readTransactionsFromExcel();
+      newTransaction.createdAt = new Date().toISOString();
       transactions.push(newTransaction);
       writeTransactionsToExcel(transactions);
       return res.status(201).json({ success: true, transaction: newTransaction });

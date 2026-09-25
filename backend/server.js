@@ -72,7 +72,7 @@ if (process.env.NODE_ENV !== 'production') {
   app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
     console.log(`📊 Excel backup stored at: ${EXCEL_FILE}`);
-    console.log(`🔗 Prisma Postgres URI configured via env`);
+    console.log(`🔗 Prisma SQLite DB configured via env`);
   });
 }
 
