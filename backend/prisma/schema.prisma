@@ -33,13 +33,13 @@ model Transaction {
 
 model BankDetails {
   userId    String   @id
-  accounts  Json
+  accounts  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Rates {
   id        String   @id @default(uuid())
-  rates     Json
+  rates     String
   updatedAt DateTime @updatedAt
 }

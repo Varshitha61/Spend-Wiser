@@ -13,7 +13,8 @@ exports.getBankDetails = async (req, res) => {
       if (!bankDetails) {
         return res.status(404).json({ error: 'Bank details not found' });
       }
-      return res.json(bankDetails);
+      const accounts = typeof bankDetails.accounts === 'string' ? JSON.parse(bankDetails.accounts) : bankDetails.accounts;
+      return res.json({ ...bankDetails, accounts });
     } catch (dbErr) {
       console.error('Prisma query failed:', dbErr.message);
       return res.status(503).json({ error: 'Database error' });
@@ -82,10 +83,12 @@ exports.updateBankDetails = async (req, res) => {
         where: { source: 'bank_sync' }
       });
 
+      const accountsStr = typeof accounts === 'string' ? accounts : JSON.stringify(accounts);
+
       const bankDetails = await prisma.bankDetails.upsert({
         where: { userId },
-        update: { accounts },
-        create: { userId, accounts }
+        update: { accounts: accountsStr },
+        create: { userId, accounts: accountsStr }
       });
 
       if (!hasBankTransactions && accounts.length > 0) {
@@ -94,7 +97,8 @@ exports.updateBankDetails = async (req, res) => {
         });
       }
 
-      return res.status(201).json(bankDetails);
+      const returnedAccounts = typeof bankDetails.accounts === 'string' ? JSON.parse(bankDetails.accounts) : bankDetails.accounts;
+      return res.status(201).json({ ...bankDetails, accounts: returnedAccounts });
     } catch (mongoErr) {
       console.error('Prisma operation failed in bank-details:', mongoErr.message);
       

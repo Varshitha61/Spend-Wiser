@@ -34,7 +34,8 @@ async function loadRatesFromDB() {
   try {
     const dbRates = await prisma.rates.findFirst();
     if (dbRates && dbRates.rates) {
-      cachedRates = { ...cachedRates, ...dbRates.rates };
+      const parsedRates = typeof dbRates.rates === 'string' ? JSON.parse(dbRates.rates) : dbRates.rates;
+      cachedRates = { ...cachedRates, ...parsedRates };
       console.log('✅ Loaded rates from Prisma DB');
     }
   } catch (err) {
@@ -65,15 +66,16 @@ const performScraping = async () => {
     
     // Save to DB
     try {
+      const ratesStr = JSON.stringify(cachedRates);
       const existing = await prisma.rates.findFirst();
       if (existing) {
         await prisma.rates.update({
           where: { id: existing.id },
-          data: { rates: cachedRates }
+          data: { rates: ratesStr }
         });
       } else {
         await prisma.rates.create({
-          data: { rates: cachedRates }
+          data: { rates: ratesStr }
         });
       }
     } catch (err) {
